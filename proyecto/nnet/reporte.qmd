@@ -1,0 +1,1070 @@
+---
+title: "Pronostico de costos obligaciones de garantías a corto plazo"
+subtitle: "Reporte Técnico"
+author: Daniel Nuño
+date: November, 2022
+format:
+  pdf: 
+    # cite-method: biblatex
+    toc: true # table of contents
+    # documentclass: scrartcl # por defecto, KOMA-Script class
+                              # otras opciones: article, report
+    papersize: letter
+    number-sections: true
+    colorlinks: true
+#bibliography: references.bib
+#csl: apa.csl
+execute:
+    echo: false
+    warning: false
+    error: false
+lang: es
+jupyter: python3
+fig-pos: 'h'
+---
+
+
+# Introducción
+Cada mes la organización de finanzas debe proveer un estimado de los gastos mensuales. Actualmente el proceso es intensivo en tiempo y en labor, dejando mucho que desear a la precisión.
+
+## Definición del problema
+
+Mes con mes la organización de finanzas, en conjunto la organización de Customer Support, debe proveer un estimado de los gastos y costos por garantías ejercidas que tendrá en el corto plazo, entre tres y doce meses. La solución actual deja que desear en cuanto la precisión, además de ser muy demandante en tiempo y personal.
+
+Estas garantías son de las computadoras e impresoras de uso comercial y personal vendidos de HP en todo el mundo.
+Geograficamente comprende 3 regiones y 10 mercados:
+
+- América
+    - Norte América
+    - Latin América
+- Europa, Africa y Medio Oriente
+    - Reino unido
+    - Europa Central
+    - Europa Sur
+    - Europa Noreste
+    - Africa y Medio Oriente
+- Asia Pacifico
+    - China
+    - Asia Mayor
+    - India
+
+En tipo de producto comprende 4 segmentos:
+
+- Computadoras
+    - Comercial - Business PC Solutions 
+    - Consumo - Consumer PC
+- Impresoras
+    - Comercial - Office Printing Systems
+    - Consumo - Home Printing Systems
+
+
+El objetivo es crear una solución que pueda proveer una precisión, al menos, igual a las soluciones actuales, pero sin la bruma, el trabajo y el tiempo que conlleva hacerlo mes con mes. Idealmente será completamente automática, supervisada, online, pero hay consideraciones que no están capturadas en los datos, como información de partes altamente defectuosas, problemas en la cadena de suministro o inversiones.
+
+Estas estimaciones en conjunto de otra información o estimaciones proporcionado por otras organizaciones tienen tres propositos principales que se usan internamente:<br>
+- Estimación del flujo de efectivo.
+- Estimación de los estados financieros de la empresa.
+- Responsabilidad a los altos ejecutivos.
+
+Parte de la visión de HP Inc es la innovación digital e internamente transformar la forma en que trabajamos. El métrico principal es la precisión de la predicción evaluado mes con mes, es decir la diferencia entre predicción y real. El benchmark es la precisión de la solución actual. Adicional, métricos relevantes son (1) cuantos días de laborales se puede reducir para la entrega de la predicción. Si ahora tarda un ciclo de 10 días en entregar entonces que tarde menos de 10 días. Y (2) cuantas horas de trabajo se reducen mes con mes, trabajo en horas por trabajador para entregar la predicción de gastos y costos.
+
+Actualmente esta tarea tiene un costo inherte a la labor de todos los que participan que teoricamente puede reducirse con una nueva implementación. La solución no debe canjear precisión por costo, sino que, por lo menos, la precisión debe ser la misma.
+
+Los costos y gastos se reportan mes con mes y se componen de costos regionales, gastos globales, y reservas y amortizaciones. Los costos globales son en su mayoría fijos relacionados a empleados o inversiones. Las reservas y amortizaciones responden a ahorros hechos para cubrir los costos basados en las ventas. Los costos regionales corresponden a costos fijos de empleados, pero también a gastos variables operativos como partes de repuesto, cadena de suministro, logistica, trabajo de ingenieros en la reparación, y llamadas de asistencia.
+
+- Total Warranty Expense
+    - Region Owned Expense
+        - Variable Expense
+            - Contact Center
+            - Delivery
+            - Supply Chain
+            - Other Repair Cost
+        - Repair OH Expense
+            - Contact Center OH
+            - Delivery OH
+            - Supply Chain OH
+        - Other Warranty Expense
+    - Worldwide Owned and Allocated Expense
+        - CS HQ Owned and Allocated
+            - CS HQ
+            - CS Investments
+        - GBU Owned and Allocated
+            - GBU Owned and Allocated
+    - Net Reserve Expense
+        - Net Reserve Expense
+            - Accrual for Shipments
+            - Amortization
+
+Ver @sec-jerarqui-de-costos para una mayor explicación.
+
+
+Para gastos de variables de contact center necesitamos saber tres cosas:
+
+- V = Cantidad de unidades vendidas en un periodo.
+- L = Porcentaje de productos con fallas o
+- V*L = cantidad de asistencias sin reparación.
+- C_llamada = costo promedio por llamada.
+
+$$
+cc variable = V*L*C_{llamada}
+$$
+
+Para gastos variables de reparación necesitamos saber tres cosas:
+
+- V = Cantidad de unidades vendidas para un periodo.
+- R = Porcentaje de unidades vendidas que necesiten reparación.
+- C_ reparación = El costo promedio de reparación.
+
+$$
+reparacion variable = V*R*C_{reparacion}
+$$
+
+Para los costos fijos o over head necesitamos saber dos cosas:
+
+- E = Cantidad de empleados.
+- C_empleado = Costo promedio por empleado.
+
+$$
+over head = E*C_{empleado}
+$$
+
+Otro de los requisitos es la granularidad en la geografía (mercado) y el tipo de producto (segmento), lo que agrega complejidad al proceso por que los costos de un segmento y mercado terminan siendo diferentes. Son 10 mercados y 5 segmentos.
+
+
+Las asunciones hasta ahora son:
+
+- Tiene tendencia.<br>
+- Tiene estacionalidad.<br>
+- Es autorregresivo.<br>
+- Es un proceso estocástico porque hay costos no previstos.<br>
+- Los números reportados no son perfectos por errores humanos, cambios operativos, contables y de sistemas.<br>
+- Datos más recientes y entendimiento del modelo de negocio son más importantes para los pronosticos al futuro. <br>
+- Un modelo explicativo de cada linea de costos es más importante que los datos historicos. El pronóstico a futuro de variables operativas es vital para una buena precisión.<br>
+- Backlog es un punto de partida importante para cada mes.<br>
+
+# Datos
+
+Los datos a utilizar son los costos mensuales de cada una de las variables que componen operativamente la organización de garantías. Estos costos monetarios al ser divididos por mercado y por línea de productos estamos hablando de múltiples series de tiempo. En cuanto al rango, los datos disponibles son de noviembre 2016 a Noviembre 2022.
+
+Los datos financieros son recolectados del General Ledger. Datos operativos son recolectados de diferentes sistemas dependiendo de la región o el tipo de producto. Los datos son consolidados en una base de datos, por lo tanto no se les aplico tratamiento más que etiquetado de datos y codificación de los valores para proteger la confidencialidad de HP.
+
+Estos datos son propiedad y confidenciales de HP Inc. y son usados por mi persona como empleado y bajo guía de mi jefe con la intención de mejorar el proceso.
+
+## Benchmark actual metodología
+
+Primero vamos a analizar el problema y establecer un benchmark, comparando los pronósticos con los resultados reales históricos. Los datos van de la siguiente manera:
+
+Para cada mes existen n estimaciones de costos pasados, que pueden ser expresados como un vector:
+
+$$
+\begin{aligned}
+C = \text{costo} \\
+t = \text{periodo} \\
+Ca_{t} = \text{costo subindice t, costo del periodo} \\
+Cf_{t} = \text{costo subindice t, costo del periodo} \\
+n = \text{número de periodos pasados} \\
+\end{aligned}
+$$
+
+$$
+flash = \{ Cf_{t-1}, Cf_{t-2}, Cf_{t-3}, \dots , Cf_{t-n} \}
+$$
+
+Y el valor real, también llamado *actual*
+$$
+actual = Ca_t
+$$
+
+El vector de error o desviación para cada periodo sea la diferencia del valor actual y cada uno de los valores del vector flash sobre el valor actual.
+
+$$
+error = \{ \frac{Ca_t}{Cf_{t-1}} -1, \frac{Ca_t}{Cf_{t-2}} -1, \dots , \frac{Ca_t}{Cf_{t-n}} -1 \}
+$$
+
+De aquí podemos calcular el valor esperado y desviación estándar del error, lo cual determina nuestro benchmark.
+
+De forma matricial, cada fila es un periodo de la forma que incluye el costo real y cada uno de las estimaciones pasadas:
+
+$$
+\{ actual, flash \}\\
+$$
+
+$$
+\{ Ca_{t}, Cf_{t-1}, Cf_{t-2}, Cf_{t-3}, \dots , Cf_{t-n} \}
+$$
+
+Definiendo $n = 6$ obtenemos la siguiente matriz.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from datetime import datetime
+raw_data_flash_assessment = pd.read_excel('dataset_flash.xlsx')
+columns_flash = ['market', 'line_cost', 'month', 't', 't-6', 't-5', 't-4', 't-3', 't-2', 't-1']
+month_as_date = [str(x)[:4] + '-' + str(x)[4:] for x in raw_data_flash_assessment['04 FISCAL MONTH']]
+month_as_date = np.array(month_as_date, dtype='datetime64')
+raw_data_flash_assessment.columns = columns_flash
+raw_data_flash_assessment['month'] = month_as_date
+index_flash = [raw_data_flash_assessment['market'], raw_data_flash_assessment['line_cost'], raw_data_flash_assessment['month']]
+vec_actual = raw_data_flash_assessment[['t']].values
+vec_flash = raw_data_flash_assessment[['t-1', 't-2', 't-3', 't-4', 't-5', 't-6']].values
+```
+
+```{python}
+raw_data_flash_assessment.head()
+```
+
+```{python}
+vec_errors = vec_actual/vec_flash - 1
+data_flash_assessment = pd.DataFrame(data=vec_errors, index=index_flash, columns=['t-1', 't-2', 't-3', 't-4', 't-5', 't-6'])
+```
+
+```{python}
+data_flash_assessment.groupby(['market', 'line_cost']).mean()
+```
+
+```{python}
+data_flash_assessment.groupby(['market', 'line_cost']).std()
+```
+
+Como ya se esperaba, mientras más periodos hacía el futuro y más alejado de *t*, mayor es el error esperado. Mientras más cerca mejor es el pronóstico.
+
+- La media en *t-6* es entre -0.46 a 0.02. Desviación estándar entre 0.1 a 0.95.
+- En *t-3* entre -0.21 a 0.001, y desviación estándar entre 0.07 a 0.4.
+- En *t-1* entre -0.009 a 0.19, y desviación estándar entre 0.01 a 0.4.
+
+Sorpresivamente CS HQ Owned and Allocated es bastante buenos en el pronóstico.
+En la mayoría de los casos, lo estimado esta subestimado y los costos reales son mayores.
+
+Como ya se había comentados anteriormente, el problema se magnifica cuando más específico en el detalle y concentras en una sub línea de costo o en un tipo de producto.
+
+Despues de varias semanas (≈20 hrs.) discutiendo con expertos de finanzas, de operaciones y explorando los datos, se ha llegado a dos conclusiones que ya se asumian posibles.
+
+El transcurso de 5 años se han pasado varios cambios operacionales que afectan la estructura de costos, la estrategia de atención y reparación para la region o tipo de producto, uso de proveedores tercearios que afecta los costos de diferente manera. La estructura de costos, los datos, siguen cambios operacionales y propias de la region o tipo de producto, lo cual hace el análisis histórico y complicado ya que existe poco información o comentarios que explique estos cambios.
+
+Cambios en los sistemas financieros, la separación de HP, cambios en las lineas de producto y agrupación de regiones, rotación de analistas financieros y cambios en los procesos contables, y errores de los analistas financieros (por que muchos de los costos son registrados por estos) existen diferencias y atípicos en los datos a traves de los años, y dependiendo de la region y tipo de producto también.
+
+Los datos, los costos, la estructura contable termina siendo imperfecta y poco útil para modelos que dependan 100% de los datos, en este caso datos históricos.
+
+- Los gastos Delivery OH y Supply Chain OH son nuevos. Empezaron a registrarse en noviembre de 2020 entonces solo hay 24 observaciones.
+- Delivery sub tipos de costos, llamados Direct e Indirect, empezaron a registrarse en noviembre de 2020 entonces solo hay 24 observaciones.
+- Tipo de productos de consumer no registra Delivery por que por el tipo de repación no es necesaria.
+- CS HQ Owned and Allocated sub tipo de gastos, llamados IT POA y Rapid and Radical, solo ocurren una vez por mes.
+- Los costos de Contact Center por mucho años estuvieron rezagados por un mes. En *t* se registraba la actividad correspondiente pero en *t+1* los costos. No estaban en par pero desde hace seis meses ahora ya estan alineados desde hace 6 meses.
+- Los cartuchos de tinta y toner son un tipo de producto llamados Supplies y existen para impresoras comerciales y consumo (uso personal). En nuestra organización no existe supplies comercial pero sí para consumo. Todos los costos y metricas relacionados a supplies comercial no tienen sentido y tienen que ser eliminados para reducir el ruido.
+- Otros negocios tiene su propio soporte de garantias.
+- Porque somos una compañia y existen economias de escala, en su mayoria todos los costos son centralizados, independientemente del tipo de producto o país.
+
+
+## Análisis exploratorio
+Por estas razones, la estrategia para resolver el problema sera definir que costos y aque nivel son necesarios a pronosticar, unicamente para dos regiones y sin distinguir por el tipo de producto.
+
+- Latin América / North América
+    - CS HQ Owned and Allocated
+    - Contact Center Expense
+    - Contact Center OH
+    - Delivery
+    - Delivery OH
+    - GBU Owned and Allocated
+    - Supply Chain
+    - Supply Chain OH
+
+Los datos disponibles son 72 periodos, desde noviembre 2016 hasta octubre 2022. El periodo fiscal para HP comienza en noviembre. Todos los valores son númericos monetarios que representan el gasto o costos incurridos en el periodo.
+
+Al final, para tener congruencia con los datos en cuanto a sub costos, paises, y tipo de producto, cada pronostico realizado para un periodo hacia delante tiene que generar 640 puntos de datos. Por ahora, la estrategía para calcularlo es tomar el valor obtenido y multiplicarlo por una matriz de porcentajes.
+
+Para este análisis me interesa observar lo siguiente para cada serie de tiempo (cada linea de costo sea una serie de tiempo):
+
+- gráficas de serie de tiempo.
+- graficas distribucion de valores.
+- valores atípicos y nulos.
+- varianza.
+- sesgo.
+- conteo de observaciones y rango de periodos.
+- correlaciones.
+- tendencia y estacionaridad.
+- estacionalidad y ciclos.
+- homocedasticidad.
+- normalidad.
+
+El análisis sera por línea de costo (8) y mercado (2) reservando los últimos tres meses para hacer pruebas
+
+```{python}
+data_raw = pd.read_excel('dataset_cost.xlsx')
+data_test = data_raw[data_raw['04 FISCAL MONTH'].isin([202210, 202209, 202208, 202207, 202206, 202205])].copy()
+data_train = data_raw[~data_raw['04 FISCAL MONTH'].isin([202210, 202209, 202208])].copy()
+month_as_date = [str(x)[:4] + '-' + str(x)[4:] for x in data_train['04 FISCAL MONTH']]
+month_as_date = np.array(month_as_date, dtype='datetime64')
+granularity_set_ = ['04 FISCAL MONTH',
+                    '03 MARKET',
+                    'Warranty Measures Hierarchy Level 04 (Label Only)',
+                    'Sum of AMOUNT or UNIT - WARRANTY']
+data_train = data_train[granularity_set_]
+data_train.columns = ['month', 'market', 'line_cost', 'value']
+data_train['month'] = month_as_date.copy()
+index_train = [data_train[['market']], data_train[['line_cost']], data_train[['month']]]
+
+data_train = data_train.groupby(by=['month', 'market', 'line_cost'])['value'].sum()
+
+la_trn_plt = data_train.unstack(fill_value=0).loc[pd.IndexSlice[:, 'Latin America Market'], :].droplevel('market')
+la_trn_plt = la_trn_plt/100
+na_trn_plt = data_train.unstack(fill_value=0).loc[pd.IndexSlice[:, 'North America Market'], :].droplevel('market')
+na_trn_plt = na_trn_plt/100
+```
+
+
+```{python}
+fig = plt.figure(figsize=(8,22), constrained_layout=True)
+#fig.suptitle('Latin America')
+x = range(0,69)
+counter = 0
+
+for line_cost in na_trn_plt.columns:
+    counter += 1
+    ax2 = fig.add_subplot(60, 3, counter)
+    ax2.text(1.15, 0.5, s=line_cost, ha='right', va='center', size=8)
+    ax2.axis('off')
+    
+    counter += 1 #next plot
+    ax3 = fig.add_subplot(60, 3, counter)
+    ax3.plot(x, na_trn_plt[line_cost])
+    #ax3.axhline(c='grey')
+
+    counter += 1 #next plot
+    ax1 = fig.add_subplot(60, 3, counter)
+    ax1.plot(x, la_trn_plt[line_cost])
+
+    plt.setp(ax1.get_xticklabels(), visible=False)
+    plt.setp(ax1.get_yticklabels(), visible=False)
+    plt.setp(ax1.get_xticklines(), visible=False)
+    plt.setp(ax1.get_yticklines(), visible=False)
+    plt.setp(ax1.spines.values(), visible=False)
+
+    plt.setp(ax3.get_xticklabels(), visible=False)
+    plt.setp(ax3.get_yticklabels(), visible=False)
+    plt.setp(ax3.get_xticklines(), visible=False)
+    plt.setp(ax3.get_yticklines(), visible=False)
+    plt.setp(ax3.spines.values(), visible=False)
+
+plt.setp(ax1.get_xticklabels(), visible=True)
+plt.setp(ax1.get_xticklines(), visible=True)
+ax1.xaxis.tick_bottom()
+
+plt.setp(ax3.get_xticklabels(), visible=True)
+plt.setp(ax3.get_xticklines(), visible=True)
+ax3.xaxis.tick_bottom()
+
+fig.suptitle('North America - Latin America costs', ha='left', size=10)
+
+plt.show()
+```
+
+Se puede apreciar los valores nulos y los atípicos.
+
+- Delivery OH empieza hasta después del mes 48.
+- Supply Chain OH empieza hasta después del mes 48.
+- Casi todos los valores atípicos son precedidos de un valor nulo (0), significa que en el valor nulo no existe registro de gastos y por lo tanto el siguiente mes es mucho más alto. Esencialmente lo correspondiente del mes pasado más el mes actual. Un mes no hay gasto registrado y al siguiente es lo correspondiente a dos meses. Son dos valores atípicos para tratar por error humano. Como en la serie de CS HQ Owned en Latin América en el mes 50.
+- La gráfica muestra que las series de tiempo carecen de gran tendencia, y son cíclicas. Procesos estacionarios y estacionales.
+
+Para la serie de tiempo se usarán variables dummies para considerar los valores atípicos o reemplazarlos por el valor inmediato anterior.
+
+
+```{python}
+la_trn_plt = data_train.unstack().loc[pd.IndexSlice[:, 'Latin America Market'], :].droplevel('market')
+na_trn_plt = data_train.unstack().loc[pd.IndexSlice[:, 'North America Market'], :].droplevel('market')
+
+pd.DataFrame(na_trn_plt.apply(lambda x: np.std(x)/np.mean(x), axis=0), columns=['NA coeficiente variación']).join(
+    pd.DataFrame(la_trn_plt.apply(lambda x: np.std(x)/np.mean(x), axis=0), columns=['LA coeficiente varianción']))
+```
+
+El coeficiente de variación indica que los costos Delivery OH y Supply Chain OH son los más dispersos. Pueden ser los más complicados de pronosticar.
+
+```{python}
+na_trn_plt.describe()
+```
+
+
+```{python}
+la_trn_plt.describe()
+```
+
+
+Lo remarcable en la descripción de los datos es:
+
+- La falta de un dato en la serie de costos Contact Center OH.
+- La falta de 13 meses en la serie de costos Supply Chain OH. Por las gráficas son datos de finales del 2016.
+- GBU Owned and CS HQ Owned para Latin América le faltan 3 meses.
+- Las serie de Delivery OH empieza apenas hace 20 meses para Norte América y 15 meses para Latin América.
+- Los órdenes de magnitud son muy diferentes entre Latin América y Norte América y entre cada tipo de costo. La covarianza no nos diría mucho y la mayoría de las veces será positiva.
+- El coeficiente de variación indica que los costos Delivery OH y Supply Chain OH son los más variables.
+
+- Las series de Delivery OH y Supply Chain OH se tratarán como que comenzaron en noviembre de 2020.
+
+
+```{python}
+scatter_corr = pd.plotting.scatter_matrix(na_trn_plt, figsize=(10,8))
+for subaxis in scatter_corr:
+    for ax in subaxis:
+        ax.xaxis.set_ticks([])
+        ax.yaxis.set_ticks([])
+        ax.set_ylabel("")
+        ax.set_xlabel("")
+```
+
+```{python}
+scatter_corr = pd.plotting.scatter_matrix(la_trn_plt, figsize=(10,8))
+for subaxis in scatter_corr:
+    for ax in subaxis:
+        ax.xaxis.set_ticks([])
+        ax.yaxis.set_ticks([])
+        ax.set_ylabel("")
+        ax.set_xlabel("")
+```
+
+
+Las distribuciones muestran los atípicos y en su mayoría son sesgados positivamente. Solo dos sesgos negativos en Latin América, 6 sesgos mayores a 1 entre ambas regiones. Las correlaciones entre los tipos de gastos son bajas. En general, para la región de Norte América los costos parecen más correlacionados que para Latin América, donde casi todos son entre -0.2 y 0.2.
+
+En algunos casos como Supply Chain OH y CS HQ Norte América tiene una correlación de 0.5. Supply Chain y Delivery, que esperas que tenga sentido porque ambos son costos variables derivados del volumen de reparaciones hechas. Para Latin América, GBU Owned y Delivery OH tienen una correlación de alrededor de 0.8.
+
+Al final, estas correlaciones y las variables como predictoras de otras variables son inusables para predecir al futuro porque no existen en el futuro entonces no es posible usarse unas a otras. Para este problema usaremos otras series de tiempo pronosticadas, que incluyen métricas operativas, envío de productos terminados e ingresos monetarios.
+
+
+```{python}
+pd.DataFrame(na_trn_plt.skew(), columns=['NA sesgo']).join(
+    pd.DataFrame(la_trn_plt.skew(), columns=['LA sesgo']))
+```
+
+## Procesamiento de datos
+
+### Atípicos
+
+Ya que los datos que tenemos son series de tiempo no correlacionadas ni dependientes (hasta ahora todos son independientes), los datos son vectores unidemensionales. Y por eso, atípicos sea **3 veces el rango interquartilico** más menos la media. Consideramos que los valor atípicos son usualmente errores humanos y no algo que tiene que ser estudiado a deteminiemto, o que la data que posiblemente explique el fenomeno no esta en este conjunto de datos. Valores nulos después de haber comenzado la serie son también valores atípicos.
+
+```{python}
+def fnd_n_rplc_outlrs(df, list_line_cost):
+    #find
+    for variable_name in list_line_cost:
+        var = df[variable_name]
+        q1 = var.quantile(0.25)
+        q3 = var.quantile(0.75)
+        iqr = q3 - q1
+        print(variable_name + ' tiene ' + str(((var < q1-3*iqr)|(var > q3+3*iqr)).sum()) + ' valores extremos.')
+    #replace
+        for x, dates in zip(var[(var < q1-3*iqr)|(var > q3+3*iqr)|(pd.isnull(var))|(var < 0)], var[(var < q1-3*iqr)|(var > q3+3*iqr)|(pd.isnull(var))|(var < 0)].index):
+            #because we belive it is a cicle of each Q then we use the correspondent month from the previous quarter
+            #or future, in case the there isn't previous values
+            #print(x, dates, var[np.datetime64(dates, 'M') - 3])
+            if (np.datetime64(dates, 'M') - 3) >= np.datetime64('2016-11', 'M'):
+                var[dates] = var[np.datetime64(dates, 'M') - 3]
+            else:
+                var[dates] = var[np.datetime64(dates, 'M') + 3]
+
+fnd_n_rplc_outlrs(na_trn_plt, ['CS HQ Owned and Allocated', 'Contact Center Expense', 'Contact Center OH', 'Delivery', 'GBU Owned and Allocated', 'Supply Chain'])
+
+fnd_n_rplc_outlrs(la_trn_plt, ['CS HQ Owned and Allocated', 'Contact Center Expense', 'Contact Center OH', 'Delivery', 'GBU Owned and Allocated', 'Supply Chain'])
+```
+
+```{python}
+def fnd_n_rplc_outlrs_oh(df, list_line_cost):
+    #find
+    for variable_name in list_line_cost:
+        var = df[variable_name].loc['2020-11':]
+        q1 = var.quantile(0.25)
+        q3 = var.quantile(0.75)
+        iqr = q3 - q1
+        print(variable_name + ' tiene ' + str(((var < q1-3*iqr)|(var > q3+3*iqr)).sum()) + ' valores extremos.')
+    #replace
+        for x, dates in zip(var[(var < q1-3*iqr)|(var > q3+3*iqr)|(pd.isnull(var))|(var < 0)], var[(var < q1-3*iqr)|(var > q3+3*iqr)|(pd.isnull(var))|(var < 0)].index):
+            #because we belive it is a cicle of each Q then we use the correspondent month from the previous quarter
+            #print(x, dates, var[np.datetime64(dates, 'M') - 3])
+            if (np.datetime64(dates, 'M') - 3) >= np.datetime64('2020-11', 'M'):
+                var[dates] = var[np.datetime64(dates, 'M') - 3]
+            else:
+                var[dates] = var[np.datetime64(dates, 'M') + 3]
+    #make sure all before is nan
+        df[variable_name].loc[:'2020-10'] = np.nan
+
+fnd_n_rplc_outlrs_oh(na_trn_plt, ['Delivery OH', 'Supply Chain OH'])
+fnd_n_rplc_outlrs_oh(la_trn_plt, ['Delivery OH', 'Supply Chain OH'])
+
+```
+
+
+### Tratamiento de sesgo y estabilización de varianza.
+
+Usando la generalización box-cox ya que los valores son estrictamente positivos. La clase PowerTransformer de sklearn encuentra el mejor lambda y normaliza media cero y desviación estandar unitaria.
+
+
+```{python}
+from sklearn.preprocessing import PowerTransformer
+na_trn_transformer = PowerTransformer(method='box-cox', standardize=True, copy=True)
+na_trnsfrm_std = na_trn_transformer.fit_transform(na_trn_plt)
+print(na_trn_transformer.lambdas_)
+na_trnsfrm_std = pd.DataFrame(na_trnsfrm_std, columns=na_trn_plt.columns, index=na_trn_plt.index)
+na_trnsfrm_std.skew()
+```
+
+```{python}
+la_trn_transformer = PowerTransformer(method='box-cox', standardize=True, copy=True)
+la_trnsfrm_std = la_trn_transformer.fit_transform(la_trn_plt)
+print(la_trn_transformer.lambdas_)
+la_trnsfrm_std = pd.DataFrame(la_trnsfrm_std, columns=la_trn_plt.columns, index=la_trn_plt.index)
+la_trnsfrm_std.skew()
+```
+
+### Descomposición series de tiempo (STL)
+
+Hasta aquí los datos que serán usados para entrenar están sin atípicos, transformados y normalizados. Lo siguiente, para modelos de series de tiempo, es estudiar la estacionalidad y estacionariedad con la descomposición de series de tiempo.
+
+Creo que el mejor tipo de modelo sería aditivo por que los valores no cambian mucho con el tiempo, un modelo aditivo es lineal donde los cambios a lo largo del tiempo se realizan consistentemente en la misma cantidad. Una tendencia lineal es una línea recta. Una estacionalidad lineal tiene la misma frecuencia (ancho de ciclos) y amplitud (alto de ciclos).
+
+A diferencia el tipo multiplicativo es no lineal, como cuadrático o exponencial. Los cambios aumentan o disminuyen con el tiempo. Una tendencia no lineal es una línea curva. Una estacionalidad no lineal tiene una frecuencia y/o amplitud creciente o decreciente a lo largo del tiempo.
+
+```{python}
+from statsmodels.tsa.seasonal import STL
+
+na_trn_plt.index = pd.date_range('2016-11-01', '2022-08-01', freq='m')
+na_trnsfrm_std.index = pd.date_range('2016-11-01', '2022-08-01', freq='m')
+
+la_trn_plt.index = pd.date_range('2016-11-01', '2022-08-01', freq='m')
+la_trnsfrm_std.index = pd.date_range('2016-11-01', '2022-08-01', freq='m')
+
+for var in ['CS HQ Owned and Allocated', 'Contact Center Expense', 'Contact Center OH', 'Delivery', 'GBU Owned and Allocated', 'Supply Chain']:
+    result = STL(na_trn_plt[var]).fit()
+    print(var + ' en promedio el residuo representa ' + str(np.round(np.mean(result.resid/result.observed),4)))
+```
+
+```{python}
+for var in ['CS HQ Owned and Allocated', 'Contact Center Expense', 'Contact Center OH', 'Delivery', 'GBU Owned and Allocated', 'Supply Chain']:
+    result = STL(la_trn_plt[var]).fit()
+    print(var + ' en promedio el residuo representa ' + str(np.round(np.mean(result.resid/result.observed),4)))
+```
+
+
+Debido que a que son muchas gráficas y series de tiempo, quiero calcular la influencia media de los residuos sobre los valores observados con el propósito de comparar entre las series y observar cuales tienen mayores valores "inexplicables" en promedio. 
+
+Como podemos observar en los resultados anteriores, *Contact Center OH* tiene un residuo muy alto promedio. *Contact Center Expense* en Latino América parece ser explicado de buena manera por la tendencia y estacionalidad.
+
+GBU Owned and Allocated en ambas regiones tiene una periodicidad muy clara pero también tiene residuos, en promedio, muy altos. Ejemplos gráficos:
+
+```{python}
+result = STL(la_trn_plt['Contact Center OH']).fit()
+result.plot()
+plt.show()
+```
+
+
+```{python}
+result = STL(na_trn_plt['GBU Owned and Allocated']).fit()
+result.plot()
+plt.show()
+```
+
+
+<div style="page-break-after: always; visibility: hidden"> 
+\pagebreak 
+</div>
+
+
+
+# Modelos
+
+Para transformar la serie de tiempo a un problema de regresión, se planteó un modelo dinámico usando tres rezagos de la misma serie. Además, se introducen otras series de tiempo que tendrían asociación con los costos:
+
+- Ingresos.
+- Número de llamadas.
+- Número de reparaciones.
+- Unidades vendidas.
+- Base instalada de unidades en garantía.
+- Porcentaje de reparaciones anualizado.
+
+Dichos datos pasan por la misma limpieza:
+
+- Limpieza de atípicos
+- Transformación box-cox
+
+
+```{python}
+reg_data_act = pd.read_excel('dataset_reg.xlsx', 'actuals')
+reg_data_act = reg_data_act[['04 FISCAL MONTH', '03 MARKET', 'Warranty Measures Hierarchy Level 04 (Label Only)', 'Sum of AMOUNT or UNIT - WARRANTY']]
+month_as_date = [str(x)[:4] + '-' + str(x)[4:] for x in reg_data_act['04 FISCAL MONTH']]
+reg_data_act.columns = ['month', 'market', 'line_cost', 'value']
+month_as_date = np.array(month_as_date, dtype='datetime64')
+reg_data_act['month'] = month_as_date
+reg_data_act = reg_data_act.groupby(by=['month', 'market', 'line_cost'])['value'].sum()
+
+la_reg = reg_data_act.unstack().loc[pd.IndexSlice[:, 'Latin America Market'], :].droplevel('market')
+na_reg = reg_data_act.unstack().loc[pd.IndexSlice[:, 'North America Market'], :].droplevel('market')
+
+fig = plt.figure(figsize=(8,20), constrained_layout=True)
+#fig.suptitle('Latin America')
+x = range(0,la_reg.shape[0])
+counter = 0
+
+for line_cost in na_reg.columns:
+    counter += 1
+    ax2 = fig.add_subplot(60, 3, counter)
+    ax2.text(1.15, 0.5, s=line_cost, ha='right', va='center', size=8)
+    ax2.axis('off')
+    
+    counter += 1 #next plot
+    ax3 = fig.add_subplot(60, 3, counter)
+    ax3.plot(x, na_reg[line_cost])
+    #ax3.axhline(c='grey')
+
+    counter += 1 #next plot
+    ax1 = fig.add_subplot(60, 3, counter)
+    ax1.plot(x, la_reg[line_cost])
+
+    plt.setp(ax1.get_xticklabels(), visible=False)
+    plt.setp(ax1.get_yticklabels(), visible=False)
+    plt.setp(ax1.get_xticklines(), visible=False)
+    plt.setp(ax1.get_yticklines(), visible=False)
+    plt.setp(ax1.spines.values(), visible=False)
+
+    plt.setp(ax3.get_xticklabels(), visible=False)
+    plt.setp(ax3.get_yticklabels(), visible=False)
+    plt.setp(ax3.get_xticklines(), visible=False)
+    plt.setp(ax3.get_yticklines(), visible=False)
+    plt.setp(ax3.spines.values(), visible=False)
+
+plt.setp(ax1.get_xticklabels(), visible=True)
+plt.setp(ax1.get_xticklines(), visible=True)
+ax1.xaxis.tick_bottom()
+
+plt.setp(ax3.get_xticklabels(), visible=True)
+plt.setp(ax3.get_xticklines(), visible=True)
+ax3.xaxis.tick_bottom()
+
+fig.suptitle('North America - Latin America regressors', ha='left', size=10)
+plt.tight_layout()
+plt.show()
+```
+
+
+Estas series de tiempo tiene la ventaja que son pronosticadas antes de tener que pronosticar los costos que se están estudiando. Es decir, los valores futuros ya son conocidos y por eso sea decidió usarlas. La intención de la predicción es de varios meses hacia delante, en este la propuesta de 3 meses. Es por eso que para t+2 se usa lo estimado por el modelo en t+1 de forma recursiva. Para t+3 se usaría lo estimado por el modelo en t+2.
+
+Las pruebas se realizaron con los modelos de redes neuronales y random forest para regresión.
+
+## Red Neuronal
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from datetime import datetime
+from sklearn.preprocessing import PowerTransformer
+
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import LSTM
+
+import tensorflow as tf
+from tensorflow import keras
+
+def fun_pipeline(dataframe, market, list_time_series):
+    #dates
+    month_as_date = [str(x)[:4] + '-' + str(x)[4:] for x in dataframe['04 FISCAL MONTH']]
+    month_as_date = np.array(month_as_date, dtype='datetime64')
+    #grouping
+    original_granularity_set = ['04 FISCAL MONTH',
+                                '03 MARKET',
+                                'Warranty Measures Hierarchy Level 04 (Label Only)',
+                                'Sum of AMOUNT or UNIT - WARRANTY']
+    dataframe = dataframe[original_granularity_set]
+    dataframe.columns = ['month', 'market', 'line_cost', 'value']
+    dataframe['month'] = month_as_date
+    dataframe = dataframe.groupby(by=['month', 'market', 'line_cost'])['value'].sum()
+    dataframe = dataframe.unstack().loc[pd.IndexSlice[:, market], :].droplevel('market')
+    dataframe = dataframe[list_time_series]
+    #outliers
+    line_cost_complete = list_time_series
+    for variable_name in line_cost_complete:
+        var = dataframe[variable_name]
+        q1 = var.quantile(0.25)
+        q3 = var.quantile(0.75)
+        iqr = q3 - q1
+
+        for x, dates in zip(var[(var < q1-1.5*iqr)|(var > q3+1.5*iqr)|(pd.isnull(var))|(var < 0)], var[(var < q1-1.5*iqr)|(var > q3+1.5*iqr)|(pd.isnull(var))|(var < 0)].index):
+            #because we belive it is a cicle of each Q then we use the correspondent month from the previous quarter
+            #print(x, dates, var[np.datetime64(dates, 'M') - 3])
+            if (np.datetime64(dates, 'M') - 3) >= np.datetime64('2016-11', 'M'):
+                var[dates] = var[np.datetime64(dates, 'M') - 3]
+            else:
+                var[dates] = var[np.datetime64(dates, 'M') + 3]
+    
+    #only for this to cost types because the time series is incomplete
+    line_cost_incomplete = ['Delivery OH', 'Supply Chain OH']
+    if line_cost_incomplete[0] in dataframe.columns:
+        for variable_name in line_cost_incomplete:
+            var = dataframe[variable_name].loc['2020-11':]
+            q1 = var.quantile(0.25)
+            q3 = var.quantile(0.75)
+            iqr = q3 - q1
+
+            for x, dates in zip(var[(var < q1-1.5*iqr)|(var > q3+1.5*iqr)|(pd.isnull(var))|(var < 0)], var[(var < q1-1.5*iqr)|(var > q3+1.5*iqr)|(pd.isnull(var))|(var < 0)].index):
+                #because we belive it is a cicle of each Q then we use the correspondent month from the previous quarter
+                #print(x, dates, var[np.datetime64(dates, 'M') - 3])
+                if (np.datetime64(dates, 'M') - 3) >= np.datetime64('2020-11', 'M'):
+                    var[dates] = var[np.datetime64(dates, 'M') - 3]
+                else:
+                    var[dates] = var[np.datetime64(dates, 'M') + 3]
+
+            dataframe[variable_name].loc[:'2020-10'] = np.nan
+    #transformers
+    dataframe_transformer = PowerTransformer(method='box-cox', standardize=True, copy=True)
+    dataframe_trn_std = dataframe_transformer.fit_transform(dataframe)
+    dataframe_trn_std = pd.DataFrame(dataframe_trn_std, columns=dataframe.columns, index=dataframe.index)
+
+    return dataframe_transformer, dataframe_trn_std, dataframe
+
+def fun_pipeline_test(dataframe, market, list_time_series):
+    #dates
+    month_as_date = [str(x)[:4] + '-' + str(x)[4:] for x in dataframe['04 FISCAL MONTH']]
+    month_as_date = np.array(month_as_date, dtype='datetime64')
+    #grouping
+    original_granularity_set = ['04 FISCAL MONTH',
+                                '03 MARKET',
+                                'Warranty Measures Hierarchy Level 04 (Label Only)',
+                                'Sum of AMOUNT or UNIT - WARRANTY']
+    dataframe = dataframe[original_granularity_set]
+    dataframe.columns = ['month', 'market', 'line_cost', 'value']
+    dataframe['month'] = month_as_date
+    dataframe = dataframe.groupby(by=['month', 'market', 'line_cost'])['value'].sum()
+    dataframe = dataframe.unstack().loc[pd.IndexSlice[:, market], :].droplevel('market')
+    dataframe = dataframe[list_time_series]
+
+    return dataframe
+
+data_raw = pd.read_excel('dataset_cost.xlsx')
+data_test = data_raw[data_raw['04 FISCAL MONTH'].isin([202210, 202209, 202208])]
+data_train = data_raw[~data_raw['04 FISCAL MONTH'].isin([202210, 202209, 202208])]
+data_train.shape, data_test.shape
+
+#list_of_costs = ['CS HQ Owned and Allocated', 'Contact Center Expense', 'Contact Center OH', 'Delivery', 'GBU Owned and Allocated', 'Supply Chain']
+list_of_costs = ['CS HQ Owned and Allocated']
+market = 'North America Market'
+transformer_train, train, train_no_trnsfrmd = fun_pipeline(data_train, market, list_of_costs)
+test = fun_pipeline_test(data_test, market, list_of_costs)
+
+reg_data_act_raw = pd.read_excel('dataset_reg.xlsx', 'actuals')
+reg_data_act_train = reg_data_act_raw.copy()
+
+list_of_regresors = ['AIR (Avg)', 'Assisted E-Suppt Interactions', 'Net Revenues', 'Total Number of Calls', 'Total Number of Repair Events', 'WIB', 'Warranty Units Adjusted']
+transformer_train_reg, train_reg, train_reg_no_trnsfrmd = fun_pipeline(reg_data_act_train, market, list_of_regresors)
+
+#set lags
+line_cost_y = list_of_costs[0]
+timesteps = 4
+timesteps_fwd = 3
+
+var = train[line_cost_y].values.reshape(-1, 1)
+var_timesteps = np.array([[j for j in var[i:i+timesteps]]
+                            for i in range(0,len(var)-timesteps+1)])[:,:,0]
+
+X, y = var_timesteps[:,:timesteps-1], var_timesteps[:,[timesteps-1]]
+y = y.ravel()
+
+X_others_reg = train_reg.values[timesteps-1:-timesteps_fwd,:]
+X = np.column_stack((X, X_others_reg))
+```
+```{python}
+#| echo: true
+nnet=keras.Sequential([
+                       keras.Input(shape=(10,)),
+                       Dense(11,activation=tf.nn.tanh),
+                       Dense(1,activation='linear')
+])
+nnet.compile(loss='mean_squared_error',optimizer='sgd')
+nnet.summary()
+```
+```{python}
+
+nnet.fit(X,y,epochs=5000, verbose = False)
+
+#last supposedly known value, fwd ones are already known as flash
+timesteps_fwd = 3
+var_pred = var.copy()
+
+for t_x in range(timesteps_fwd):
+    X_others_reg = train_reg.values[-timesteps+t_x:-timesteps+1+t_x].reshape(-1,1)
+    XX = np.vstack((var_pred[len(var_pred) - timesteps+1:], X_others_reg))
+    y_hat_tplus1 = nnet(XX.reshape(1,10))
+    var_pred = np.concatenate((var_pred, y_hat_tplus1))
+
+x_prds_plt = len(train[timesteps-1:].values)
+
+plt.plot(range(x_prds_plt), train_no_trnsfrmd[timesteps-1:].values,label='series train')
+plt.plot(range(x_prds_plt,x_prds_plt+timesteps_fwd), test, label='series test')
+plt.plot(range(x_prds_plt,x_prds_plt+timesteps_fwd), transformer_train.inverse_transform(var_pred[-(timesteps_fwd):]), label='prediction')
+plt.legend()
+plt.grid()
+plt.title(list_of_costs[0])
+plt.show()
+
+(test - transformer_train.inverse_transform(var_pred[-(timesteps_fwd):]))/test
+
+from sklearn.ensemble import RandomForestRegressor
+
+```
+
+
+## Random Forest
+
+```{python}
+#| echo: true
+model_tree = RandomForestRegressor(n_estimators=1000,
+                               criterion='mse',
+                               max_depth=None,
+                               min_samples_split=2,
+                               min_samples_leaf=1,
+                               max_features='auto',
+                               bootstrap=True,
+                               oob_score=False,
+                               random_state=0,
+                               verbose=1)
+
+```
+```{python}
+model_tree = model_tree.fit(X, y) # prediction with random forest
+
+#last supposedly known value, fwd ones are already known as flash
+var_pred_tree = var.copy()
+
+for t_x in range(timesteps_fwd):
+    X_others_reg = train_reg.values[-timesteps+t_x:-timesteps+1+t_x].reshape(-1,1)
+    XX = np.vstack((var_pred_tree[len(var_pred_tree) - timesteps+1:], X_others_reg))
+    y_hat_tplus1 = model_tree.predict(XX.reshape(1,10))
+    var_pred_tree = np.concatenate((var_pred_tree, y_hat_tplus1.reshape(1,1)))
+
+x_prds_plt = len(train[timesteps-1:].values)
+
+plt.plot(range(x_prds_plt), train_no_trnsfrmd[timesteps-1:].values,label='series train')
+plt.plot(range(x_prds_plt,x_prds_plt+timesteps_fwd), test, label='series test')
+plt.plot(range(x_prds_plt,x_prds_plt+timesteps_fwd), transformer_train.inverse_transform(var_pred_tree[-(timesteps_fwd):]), label='prediction')
+plt.legend()
+plt.title(list_of_costs[0])
+plt.grid()
+plt.show()
+
+(test - transformer_train.inverse_transform(var_pred_tree[-(timesteps_fwd):]))/test
+```
+
+
+## Resultados
+
+Los siguientes resultados muestran las estimaciones de las 6 series de tiempo, comparado para cada modelo (random forest y neural net), para cada mercado (Latin América, Norte América). Cada serie y para cada modelo provee 3 pronosticos. Eso da como resultado que se tienen que evaluar y comparar al menos 72 valores. La forma de comparar es por el error como porcentaje, al igual que el benchmark discutido arriba.
+
+Dos notas previas:
+
+- Porque se necesita hacer varias veces más y que sean modelos similares en la estructura no se optimizaron hiper parámetros
+- Porque el modelo es dependiente de valores ya conocidos (pronosticados), si sus datos y estimaciones están mal nuestro modelo y resultado estarán mal.
+
+### Norte América
+```{python}
+error_tree_df = pd.DataFrame(index = pd.DatetimeIndex(['2022-08-01', '2022-09-01', '2022-10-01'], dtype='datetime64[ns]', name='month', freq=None) )
+error_nnet_df = pd.DataFrame(index = pd.DatetimeIndex(['2022-08-01', '2022-09-01', '2022-10-01'], dtype='datetime64[ns]', name='month', freq=None) )
+
+list_of_costs = ['CS HQ Owned and Allocated', 'Contact Center Expense', 'Contact Center OH', 'Delivery', 'GBU Owned and Allocated', 'Supply Chain']
+market = 'North America Market'
+
+for variable in list_of_costs:
+    transformer_train, train, train_no_trnsfrmd = fun_pipeline(data_train, market, [variable])
+    test = fun_pipeline_test(data_test, market, [variable])
+
+    list_of_regresors = ['AIR (Avg)', 'Assisted E-Suppt Interactions', 'Net Revenues', 'Total Number of Calls', 'Total Number of Repair Events', 'WIB', 'Warranty Units Adjusted']
+    transformer_train_reg, train_reg, train_reg_no_trnsfrmd = fun_pipeline(reg_data_act_train, market, list_of_regresors)
+
+    #set lags
+    line_cost_y = variable
+    timesteps = 4
+    timesteps_fwd = 3
+
+    var = train[line_cost_y].values.reshape(-1, 1)
+    var_timesteps = np.array([[j for j in var[i:i+timesteps]]
+                                for i in range(0,len(var)-timesteps+1)])[:,:,0]
+
+    X, y = var_timesteps[:,:timesteps-1], var_timesteps[:,[timesteps-1]]
+    y = y.ravel()
+    #X.shape, y.shape
+
+    X_others_reg = train_reg.values[timesteps-1:-timesteps_fwd,:]
+    X = np.column_stack((X, X_others_reg))
+    #X.shape
+
+    #neural net
+    nnet=keras.Sequential([
+                        keras.Input(shape=(10,)),
+                        Dense(11,activation=tf.nn.tanh),
+                        Dense(1,activation='linear')
+    ])
+    nnet.compile(loss='mean_squared_error',optimizer='sgd')
+
+    nnet.fit(X,y,epochs=5000, verbose = False)
+
+    #last supposedly known value, fwd ones are already known as flash
+    timesteps_fwd = 3
+    var_pred = var.copy()
+
+    for t_x in range(timesteps_fwd):
+        X_others_reg = train_reg.values[-timesteps+t_x:-timesteps+1+t_x].reshape(-1,1)
+        XX = np.vstack((var_pred[len(var_pred) - timesteps+1:], X_others_reg))
+        y_hat_tplus1 = nnet(XX.reshape(1,10))
+        var_pred = np.concatenate((var_pred, y_hat_tplus1))
+
+    x_prds_plt = len(train[timesteps-1:].values)
+    #erros
+    error_nnet = (test - transformer_train.inverse_transform(var_pred[-(timesteps_fwd):]))/test
+    error_nnet_df = error_nnet_df.join(error_nnet)
+
+    #tree
+    model_tree = RandomForestRegressor(n_estimators=1000,
+                                criterion='mse',
+                                max_depth=None,
+                                min_samples_split=2,
+                                min_samples_leaf=1,
+                                max_features='auto',
+                                bootstrap=True,
+                                oob_score=False,
+                                random_state=0,
+                                verbose=0)
+    model_tree = model_tree.fit(X, y) # prediction with random forest
+    #last supposedly known value, fwd ones are already known as flash
+    var_pred_tree = var.copy()
+
+    for t_x in range(timesteps_fwd):
+        X_others_reg = train_reg.values[-timesteps+t_x:-timesteps+1+t_x].reshape(-1,1)
+        XX = np.vstack((var_pred_tree[len(var_pred_tree) - timesteps+1:], X_others_reg))
+        y_hat_tplus1 = model_tree.predict(XX.reshape(1,10))
+        var_pred_tree = np.concatenate((var_pred_tree, y_hat_tplus1.reshape(1,1)))
+    
+    error_tree = (test - transformer_train.inverse_transform(var_pred_tree[-(timesteps_fwd):]))/test
+    error_tree_df = error_tree_df.join(error_tree)
+
+print(error_tree_df)
+
+print(error_nnet_df)
+```
+
+
+### Latin América
+
+```{python}
+error_tree_df = pd.DataFrame(index = pd.DatetimeIndex(['2022-08-01', '2022-09-01', '2022-10-01'], dtype='datetime64[ns]', name='month', freq=None) )
+error_nnet_df = pd.DataFrame(index = pd.DatetimeIndex(['2022-08-01', '2022-09-01', '2022-10-01'], dtype='datetime64[ns]', name='month', freq=None) )
+
+list_of_costs = ['CS HQ Owned and Allocated', 'Contact Center Expense', 'Contact Center OH', 'Delivery', 'GBU Owned and Allocated', 'Supply Chain']
+market = 'Latin America Market'
+
+for variable in list_of_costs:
+    transformer_train, train, train_no_trnsfrmd = fun_pipeline(data_train, market, [variable])
+    test = fun_pipeline_test(data_test, market, [variable])
+
+    list_of_regresors = ['AIR (Avg)', 'Assisted E-Suppt Interactions', 'Net Revenues', 'Total Number of Calls', 'Total Number of Repair Events', 'WIB', 'Warranty Units Adjusted']
+    transformer_train_reg, train_reg, train_reg_no_trnsfrmd = fun_pipeline(reg_data_act_train, market, list_of_regresors)
+
+    #set lags
+    line_cost_y = variable
+    timesteps = 4
+    timesteps_fwd = 3
+
+    var = train[line_cost_y].values.reshape(-1, 1)
+    var_timesteps = np.array([[j for j in var[i:i+timesteps]]
+                                for i in range(0,len(var)-timesteps+1)])[:,:,0]
+
+    X, y = var_timesteps[:,:timesteps-1], var_timesteps[:,[timesteps-1]]
+    y = y.ravel()
+    #X.shape, y.shape
+
+    X_others_reg = train_reg.values[timesteps-1:-timesteps_fwd,:]
+    X = np.column_stack((X, X_others_reg))
+    #X.shape
+
+    #neural net
+    nnet=keras.Sequential([
+                        keras.Input(shape=(10,)),
+                        Dense(11,activation=tf.nn.tanh),
+                        Dense(1,activation='linear')
+    ])
+    nnet.compile(loss='mean_squared_error',optimizer='sgd')
+
+    nnet.fit(X,y,epochs=5000, verbose = False)
+
+    #last supposedly known value, fwd ones are already known as flash
+    timesteps_fwd = 3
+    var_pred = var.copy()
+
+    for t_x in range(timesteps_fwd):
+        X_others_reg = train_reg.values[-timesteps+t_x:-timesteps+1+t_x].reshape(-1,1)
+        XX = np.vstack((var_pred[len(var_pred) - timesteps+1:], X_others_reg))
+        y_hat_tplus1 = nnet(XX.reshape(1,10))
+        var_pred = np.concatenate((var_pred, y_hat_tplus1))
+
+    x_prds_plt = len(train[timesteps-1:].values)
+    #erros
+    error_nnet = (test - transformer_train.inverse_transform(var_pred[-(timesteps_fwd):]))/test
+    error_nnet_df = error_nnet_df.join(error_nnet)
+
+    #tree
+    model_tree = RandomForestRegressor(n_estimators=1000,
+                                criterion='mse',
+                                max_depth=None,
+                                min_samples_split=2,
+                                min_samples_leaf=1,
+                                max_features='auto',
+                                bootstrap=True,
+                                oob_score=False,
+                                random_state=0,
+                                verbose=0)
+    model_tree = model_tree.fit(X, y) # prediction with random forest
+    #last supposedly known value, fwd ones are already known as flash
+    var_pred_tree = var.copy()
+
+    for t_x in range(timesteps_fwd):
+        X_others_reg = train_reg.values[-timesteps+t_x:-timesteps+1+t_x].reshape(-1,1)
+        XX = np.vstack((var_pred_tree[len(var_pred_tree) - timesteps+1:], X_others_reg))
+        y_hat_tplus1 = model_tree.predict(XX.reshape(1,10))
+        var_pred_tree = np.concatenate((var_pred_tree, y_hat_tplus1.reshape(1,1)))
+    
+    error_tree = (test - transformer_train.inverse_transform(var_pred_tree[-(timesteps_fwd):]))/test
+    error_tree_df = error_tree_df.join(error_tree)
+
+print(error_tree_df)
+
+print(error_nnet_df)
+```
+
+Como se puede apreciar, por los errores y las gráficas, algunas de las variables tienen brincos inesperados en t+1. En estimaciones t+2 y t+3 los errores son menores. Lo que me hace pensar que los modelos hacen un buen trabajo generalizando lo que debería ser en base a los valores previos y los otros datos asociados a los costos operativos.
+
+Para algunos tipos de costos parece funcionar bien pero para otros no. En general no supero el benchmark. Los datos tienen un comportamiento errático, lo que ocasiona que los modelos dependientes de datos pasados no funcionen de la mejor manera.
+
+Se necesita probar con otro modelos más sofisticados como LSTM y sencillos como promedios moviles. Además, estudiar a detalle un modelo que no sea únicamente dependiente de su propia serie, conseguir datos que expliquen el fenómeno y por último reducir las irregularidades por errores humanos.
+
+
+<div style="page-break-after: always; visibility: hidden"> 
+\pagebreak 
+</div>
+
+# Anexos
+
+## Definición de costos {#sec-jerarqui-de-costos}
+
+| **Costo**                             | **Explicación**                                                                                                                                                                                                         |
+|---------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Region Owned Expense                  | Costos pertenecientes a la region, propios de operaciones involucradas en reparación y asistencia.                                                                                                                      |
+| Variable Expense                      | Costos variables de operaciones relacionados a la repación, insumos o asistencia a productos.                                                                                                                           |
+| Contact Center                        | Costos variables de asistencia telefónica.                                                                                                                                                                              |
+| Delivery                              | Costos variables de reparación y asistencia física.                                                                                                                                                                     |
+| Supply Chain                          | Costos variables de la cadena de suministro, insumo de partes, impuestos, logistico e inventario.                                                                                                                       |
+| Repair OH Expense                     | Costos fijos o semifijos relacionados empleados de la administración y soporte de las operaciones diarias.                                                                                                              |
+| Contact Center OH                     | Costos fijos o semifijos de empleados administrativos para Contact Center.                                                                                                                                              |
+| Delivery OH                           | Costos fijos o semifijos de empleados administrativos para el grupo de técnicos e ingenieros.                                                                                                                           |
+| Supply Chain OH                       | Costos fijos o semifijos de empleados administrativos para el grupo de cadena de suministro.                                                                                                                            |
+| Other Warranty Expense                | Otros regionales.                                                                                                                                                                                                       |
+| Worldwide Owned and Allocated Expense | Costos fijos o semifijos de empleados e inversiones globales que soportan a los tres grupos operativos de CS (Customer Support).                                                                                        |
+| CS HQ                                 | Costos fijos de empleados globales que soportan a los tres grupos operativos, incluyendo administrativos, finanzas y directivos.                                                                                        |
+| CS Investments                        | Costos fijos de inversiones globales.                                                                                                                                                                                   |
+| GBU Owned and Allocated               | Costos de tipo diverso, fijo o variables, que incluye empleados y costos operativos de las unidades globales de negocio (Global Business Unit).                                                                         |
+| Net Reserve Expense                   | Reserva neta es la suma de Reserva (Accrual) más Amortización (Amortization). Tipicamente un número positivo.                                                                                                           |
+| Accrual for Shipments                 | Reserva de dinero que la compañia realiza con el motivo de hacer frente a sus obligaciones y pagar a sus empleados y proveedores. Basado en el costo promedio y el porcentaje de fallas esperadas del producto vendido. |
+| Amortization                          | Amortización de la reservea, siempre un número negativo.                                                                                                                                                                |

@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.179">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>analisis_svr</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="analisis_svr_files/libs/clipboard/clipboard.min.js"></script>
+<script src="analisis_svr_files/libs/quarto-html/quarto.js"></script>
+<script src="analisis_svr_files/libs/quarto-html/popper.min.js"></script>
+<script src="analisis_svr_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="analisis_svr_files/libs/quarto-html/anchor.min.js"></script>
+<link href="analisis_svr_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="analisis_svr_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="analisis_svr_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="analisis_svr_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="analisis_svr_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+<p><br> <br></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://upload.wikimedia.org/wikipedia/en/5/5f/Western_Institute_of_Technology_and_Higher_Education_logo.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">iteso</figcaption><p></p>
+</figure>
+</div>
+<p><strong> InstitutoTecnológico y de Estudios Superiores de Occidente </strong> <br> <strong> Maestría Ciencia de Datos </strong> <br></p>
+<section id="modelado-predictivo-aplicación-svr-para-costos-de-garantías-de-hp-inc." class="level1">
+<h1>Modelado Predictivo: Aplicación SVR para costos de garantías de HP Inc.&nbsp;</h1>
+<p><br> <br></p>
+<hr>
+<p>Daniel Nuño <br> Profesor: Dr.&nbsp;Riemmann Ruiz Cruz <br> Fecha entrega: 16 de octubre, 2022 <br></p>
+<hr>
+<p><br> <br></p>
+<div style="page-break-after: always;">
+
+</div>
+<section id="definición-del-problema" class="level2">
+<h2 class="anchored" data-anchor-id="definición-del-problema">Definición del problema</h2>
+<p>Mes con mes la organización de finanzas, en conjunto la organización de Customer Support, debe proveer un estimado de los gastos y costos por garantías ejercidas que tendrá en el corto plazo, entre tres y doce meses. La solución actual deja que desear en cuanto la precisión, además de ser muy demandante en tiempo y personal.</p>
+<p>Estas garantías son de las computadoras e impresoras de uso comercial y personal vendidos de HP en todo el mundo. Geograficamente comprende 3 regiones y 10 mercados:</p>
+<ul>
+<li>America
+<ul>
+<li>Norte America</li>
+<li>Latin America</li>
+</ul></li>
+<li>Europa, Africa y Medio Oriente
+<ul>
+<li>Reino unido</li>
+<li>Europa Central</li>
+<li>Europa Sur</li>
+<li>Europa Noreste</li>
+<li>Africa y Medio Oriente</li>
+</ul></li>
+<li>Asia Pacifico
+<ul>
+<li>China</li>
+<li>Asia Mayor</li>
+<li>India</li>
+</ul></li>
+</ul>
+<p>En tipo de producto comprende 4 segmentos:</p>
+<ul>
+<li>Computadoras
+<ul>
+<li>Comercial - Business PC Solutions</li>
+<li>Consumo - Consumer PC</li>
+</ul></li>
+<li>Impresoras
+<ul>
+<li>Comercial - Office Printing Systems</li>
+<li>Consumo - Home Printing Systems</li>
+</ul></li>
+</ul>
+<p>El objetivo es crear una solución que pueda proveer una precisión, al menos, igual a las soluciones actuales, pero sin la bruma, el trabajo y el tiempo que conlleva hacerlo mes con mes. Idealmente será completamente automática, supervisada, online, pero hay consideraciones que no están capturadas en los datos, como información de partes altamente defectuosas, problemas en la cadena de suministro o inversiones.</p>
+<p>Estas estimaciones en conjunto de otra información o estimaciones proporcionado por otras organizaciones tienen tres propositos principales que se usan internamente:<br> - Estimación del flujo de efectivo. - Estimación de los estados financieros de la empresa. - Responsabilidad a los altos ejecutivos.</p>
+<p>Parte de la visión de HP Inc es la innovación digital e internamente transformar la forma en que trabajamos. El métrico principal es la precisión de la predicción evaluado mes con mes, es decir la diferencia entre predicción y real. El benchmark es la precisión de la solución actual. Adicional, métricos relevantes son (1) cuantos días de laborales se puede reducir para la entrega de la predicción. Si ahora tarda un ciclo de 10 días en entregar entonces que tarde menos de 10 días. Y (2) cuantas horas de trabajo se reducen mes con mes, trabajo en horas por trabajador para entregar la predicción de gastos y costos.</p>
+<p>Actualmente esta tarea tiene un costo inherte a la labor de todos los que participan que teoricamente puede reducirse con una nueva implementación. La solución no debe canjear precisión por costo, sino que, por lo menos, la precisión debe ser la misma.</p>
+<p>Los costos y gastos se reportan mes con mes y se componen de costos regionales, gastos globales, y reservas y amortizaciones. Los costos globales son en su mayoría fijos relacionados a empleados o inversiones. Las reservas y amortizaciones responden a ahorros hechos para cubrir los costos basados en las ventas. Los costos regionales corresponden a costos fijos de empleados, pero también a gastos variables operativos como partes de repuesto, cadena de suministro, logistica, trabajo de ingenieros en la reparación, y llamadas de asistencia.</p>
+<ul>
+<li>Net Revenue
+<ul>
+<li>Total Warranty Expense
+<ul>
+<li>Region Owned Expense
+<ul>
+<li>Variable Expense
+<ul>
+<li>Contact Center Expense</li>
+<li>Delivery</li>
+<li>Supply Chain</li>
+</ul></li>
+<li>Repair OH Expense
+<ul>
+<li>Delivery OH</li>
+<li>Supply Chain OH</li>
+</ul></li>
+</ul></li>
+<li>Worldwide Owned and Allocated Expense
+<ul>
+<li>CS HQ Owned and Allocated</li>
+<li>GBU Owned and Allocated</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="preparacion-de-los-datos" class="level2">
+<h2 class="anchored" data-anchor-id="preparacion-de-los-datos">Preparacion de los datos</h2>
+<p>Los datos a útilizar son los costos mensuales de cada una de las variables que componen operativamente la organización de garantías. En cuanto al rango, los datos disponibles son de Noviembre 2016 a Julio 2022. Los datos financieros son son consolidados en una base de datos, por lo tanto no se les aplico mucho tratamiento más que etiquetado de datos y codificación de los valores para proteger la confidencialidad de HP.</p>
+<p>Para este trabajo, el enfoqué sera para el mercado de Norte America y las computadoras comerciales.</p>
+<div class="cell" data-execution_count="127">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> MinMaxScaler</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVR</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> (linear_kernel,polynomial_kernel,rbf_kernel)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error <span class="im">as</span> mse, r2_score</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">'fivethirtyeight'</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>raw_data <span class="op">=</span> pd.read_excel(<span class="st">'dataset.xlsx'</span>, <span class="st">'na_bps'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="128">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> raw_data.copy()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>data.month <span class="op">=</span> data.month <span class="op">+</span> <span class="st">'-01'</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'month'</span>] <span class="op">=</span> pd.to_datetime(data[<span class="st">'month'</span>])</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>data.account <span class="op">=</span> data[<span class="st">'account'</span>].astype(<span class="st">'str'</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> data.pivot(index<span class="op">=</span>[<span class="st">'month'</span>], columns<span class="op">=</span>[<span class="st">'account'</span>], values<span class="op">=</span>[<span class="st">'total'</span>])</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> data.droplevel(<span class="dv">0</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>X_periods <span class="op">=</span> np.arange(<span class="bu">len</span>(data)).reshape(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>data_index <span class="op">=</span> pd.date_range(start<span class="op">=</span>data.index.<span class="bu">min</span>(),</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                            end<span class="op">=</span>data.index.<span class="bu">max</span>(),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                            freq<span class="op">=</span><span class="st">'M'</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> data.fillna(axis<span class="op">=</span><span class="dv">1</span>, method<span class="op">=</span><span class="st">'backfill'</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> data.loc[[<span class="st">"2022-06-01"</span>, <span class="st">"2022-07-01"</span>]]</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>train_index <span class="op">=</span> <span class="bu">set</span>(data.index) <span class="op">-</span> <span class="bu">set</span>(test_data.index)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>train_data <span class="op">=</span> data.loc[<span class="bu">list</span>(train_index)]</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>train_data <span class="op">=</span> train_data.sort_index()</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> MinMaxScaler()</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>scaler.fit(train_data)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>data_scale <span class="op">=</span> scaler.transform(data)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>data_scale <span class="op">=</span> pd.DataFrame(data_scale, columns<span class="op">=</span>data.columns, index<span class="op">=</span>data.index)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Para separar los datos entre entrenamiento y prueba voy y ya que es una serie de tiempo, voy a dejar los últimos dos valores para hacer la prueba. Estos últimos dos valores no son parte del fit para <em>MinMaxScaler</em> ni como parte del entrenamiento.</p>
+<p>La siguiente gráfica podemos ver el comportamiento de los datos y validar el efecto de la normalización.</p>
+<div class="cell" data-execution_count="129">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">16</span>,<span class="dv">6</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.plot(data)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Month'</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Value'</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Before scale'</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">2</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>plt.plot(data_scale)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Month'</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Value'</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'After scale'</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.legend(data.columns)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-4-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<section id="ingeniería-de-características-para-encontrar-el-mejor-conjunto-de-datos" class="level3">
+<h3 class="anchored" data-anchor-id="ingeniería-de-características-para-encontrar-el-mejor-conjunto-de-datos">Ingeniería de características para encontrar el mejor conjunto de datos</h3>
+<p>Ya que para esta serie de tiempo no tenemos más variables dependientes que expliquen el comportamiento, queremos encontrar las características que generen el mejor modelo. Para esto vamos a comparar los data sets con la máquina de soporte lineal. Posteriormente que seleccionemos un conjunto de datos, vamos a comparar con los demás modelos de máquina de soporte y Kernels.</p>
+<p>La cuenta para realizar esta investigación es <strong>Supply Chain</strong>.</p>
+<div class="cell" data-execution_count="131">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>cuenta_base <span class="op">=</span> <span class="st">'Supply Chain'</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> data_scale[cuenta_base].values.ravel()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> X_periods</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">5</span>))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.plot(X, y, c<span class="op">=</span><span class="st">'b'</span>, label<span class="op">=</span>cuenta_base)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'time'</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'value'</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-5-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="132">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compare_svr(X, y, test_window, kernel, epsilon, gamma, degree, do_plot<span class="op">=</span><span class="st">'No'</span>):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> test_window <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="co"># params</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="co">#epsilon = 0.1</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="co">#kernel = 'linear'</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">#gamma = 'auto'</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">#degree = 3</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="co"># kernel transformation</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> kernel <span class="op">==</span> <span class="st">'linear'</span>:</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>            K_x <span class="op">=</span> linear_kernel(X)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> kernel <span class="op">==</span> <span class="st">'rbf'</span>:</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>            K_x <span class="op">=</span> rbf_kernel(X)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>            K_x <span class="op">=</span> polynomial_kernel(X)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># creating a SVR model class</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        model_svr <span class="op">=</span> SVR(kernel<span class="op">=</span>kernel, epsilon<span class="op">=</span>epsilon, gamma<span class="op">=</span>gamma, degree<span class="op">=</span>degree)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Step 2. Training the model</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        model_svr.fit(X, y)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Step 3. Using the model</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        y_hat <span class="op">=</span> model_svr.predict(X)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Step 4. Evaluation of results</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        sv_x <span class="op">=</span> model_svr.support_</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        R2 <span class="op">=</span> model_svr.score(X,y)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        Y_plot <span class="op">=</span> model_svr.predict(X)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        <span class="co">#%% Prediction using the optimization problem results.</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        alphas <span class="op">=</span> model_svr.dual_coef_</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        x_sv <span class="op">=</span> model_svr.support_vectors_</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        b <span class="op">=</span> model_svr.intercept_</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Needs the correct Kernel</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> kernel <span class="op">==</span> <span class="st">'linear'</span>:</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>            K_x <span class="op">=</span> linear_kernel(x_sv, X)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> kernel <span class="op">==</span> <span class="st">'rbf'</span>:</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>            K_x <span class="op">=</span> rbf_kernel(x_sv, X)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>            K_x <span class="op">=</span> polynomial_kernel(x_sv, X)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>        Y_p <span class="op">=</span> np.dot(alphas, K_x) <span class="op">+</span> b</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> do_plot <span class="op">==</span> <span class="st">'Yes'</span>:</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> X.shape[<span class="dv">1</span>] <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>                <span class="co"># View the results</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>                fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">16</span>,<span class="dv">8</span>))</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>                plt.subplot(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>                plt.plot(X, y, c<span class="op">=</span><span class="st">'b'</span>, label<span class="op">=</span><span class="st">'data'</span>)</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>                plt.scatter(X[sv_x], y[sv_x], c<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'SVR support vectors'</span>, zorder<span class="op">=</span><span class="dv">1</span>,edgecolors<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>                plt.plot(X, Y_plot, c<span class="op">=</span><span class="st">'k'</span>,label<span class="op">=</span><span class="st">'SVR regression'</span>)</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>                plt.plot(X, Y_plot<span class="op">+</span>epsilon, c<span class="op">=</span><span class="st">'k'</span>, linestyle<span class="op">=</span><span class="st">'dashed'</span>,label<span class="op">=</span><span class="st">'SVR+\epsilon'</span>)</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>                plt.plot(X, Y_plot<span class="op">-</span>epsilon, c<span class="op">=</span><span class="st">'k'</span>, linestyle<span class="op">=</span><span class="st">'dashed'</span>,label<span class="op">=</span><span class="st">'SVR-\epsilon'</span>)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>                plt.xlabel(<span class="st">'time'</span>)</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>                plt.ylabel(<span class="st">'target'</span>)</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>                plt.title(<span class="st">'R^2 = </span><span class="sc">%0.4f</span><span class="st">'</span><span class="op">%</span>model_svr.score(X,y))</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>                plt.legend()</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>                plt.subplot(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">2</span>)</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>                plt.scatter(y_hat, y, c<span class="op">=</span><span class="st">'b'</span>, label<span class="op">=</span><span class="st">'Estimation'</span>)</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>                plt.plot(y, y, c<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Perfect estimation'</span>)</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>                plt.xlabel(<span class="st">'Y estimated'</span>)</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>                plt.ylabel(<span class="st">'Y real'</span>)</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>                plt.title(<span class="st">'MSE = </span><span class="sc">%0.4f</span><span class="st">'</span><span class="op">%</span>mse(y, y_hat))</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>                plt.legend()</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>                plt.show()</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>                <span class="co"># View the results</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>                plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>,<span class="dv">5</span>))</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>                plt.scatter(y_hat, y, c<span class="op">=</span><span class="st">'b'</span>, label<span class="op">=</span><span class="st">'Estimation'</span>)</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>                plt.plot(y, y, c<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Perfect estimation'</span>)</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>                plt.xlabel(<span class="st">'Y estimated'</span>)</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>                plt.ylabel(<span class="st">'Y real'</span>)</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>                plt.title(<span class="st">'SVM '</span> <span class="op">+</span> kernel <span class="op">+</span> <span class="st">' K |MSE = </span><span class="sc">%0.4f</span><span class="st">'</span><span class="op">%</span>mse(y, y_hat) <span class="op">+</span> <span class="st">' | R^2 = </span><span class="sc">%0.4f</span><span class="st">'</span><span class="op">%</span>model_svr.score(X,y))</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>                plt.legend()</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>                plt.show()</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> mse(y, y_hat), model_svr.score(X,y)</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>    <span class="co">#split test and train</span></span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>        X_train <span class="op">=</span> X[:<span class="op">-</span>test_window]</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>        X_test <span class="op">=</span> X[<span class="bu">len</span>(X) <span class="op">-</span> test_window:]</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>        y_train <span class="op">=</span> y[:<span class="op">-</span>test_window]</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>        y_test <span class="op">=</span> y[<span class="bu">len</span>(y) <span class="op">-</span> test_window:]</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>        <span class="co"># creating a SVR model class</span></span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>        model_svr <span class="op">=</span> SVR(kernel<span class="op">=</span>kernel, epsilon<span class="op">=</span>epsilon, gamma<span class="op">=</span>gamma, degree<span class="op">=</span>degree)</span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Training the model</span></span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>        model_svr.fit(X_train, y_train)</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>        <span class="co">#Using the model</span></span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>        y_hat <span class="op">=</span> model_svr.predict(X_test)</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>        <span class="co">#return train and test model accuracy</span></span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>        R2_train <span class="op">=</span> r2_score(y_train, model_svr.predict(X_train))</span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>        mse_mtrc_train <span class="op">=</span> mse(y_train, model_svr.predict(X_train))</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>        R2_test <span class="op">=</span> r2_score( y_test, y_hat)</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>        mse_mtrc_test <span class="op">=</span> mse(y_test, y_hat)</span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> do_plot <span class="op">==</span> <span class="st">'Yes'</span>:</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>            plt.figure()</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>            plt.scatter(x<span class="op">=</span><span class="bu">range</span>(<span class="bu">len</span>(X_train)), y<span class="op">=</span>y_train, c<span class="op">=</span><span class="st">'b'</span>, label<span class="op">=</span><span class="st">'train'</span>, s<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>            plt.scatter(x<span class="op">=</span><span class="bu">range</span>(<span class="bu">len</span>(X)<span class="op">-</span>test_window,<span class="bu">len</span>(X)), y<span class="op">=</span>y_test, c<span class="op">=</span><span class="st">'g'</span>, label<span class="op">=</span><span class="st">'test'</span>, s<span class="op">=</span><span class="dv">40</span>)</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>            plt.scatter(x<span class="op">=</span><span class="bu">range</span>(<span class="bu">len</span>(X)<span class="op">-</span>test_window,<span class="bu">len</span>(X)), y<span class="op">=</span>y_hat, c<span class="op">=</span><span class="st">'r'</span>, label<span class="op">=</span><span class="st">'estimated'</span>, s<span class="op">=</span><span class="dv">40</span>)</span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>            plt.xlabel(<span class="st">'period month'</span>)</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>            plt.ylabel(<span class="st">'value'</span>)</span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>            plt.title(<span class="st">'LS '</span> <span class="op">+</span> kernel <span class="op">+</span> <span class="st">' K |MSE = </span><span class="sc">%0.3f</span><span class="st">'</span><span class="op">%</span>mse(y_test, y_hat) <span class="op">+</span> <span class="st">' |R^2 = </span><span class="sc">%0.3f</span><span class="st">'</span><span class="op">%</span>r2_score(y_test, y_hat))</span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>            plt.legend()</span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>            plt.show()</span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>        <span class="co"># return train and test metrics</span></span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> mse_mtrc_train, R2_train, mse_mtrc_test, <span class="st">'</span><span class="sc">%0.2f</span><span class="st">'</span><span class="op">%</span>R2_test</span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">0</span> , <span class="st">'linear'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">3</span>, do_plot<span class="op">=</span><span class="st">'Yes'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>No muy buenos resultados usando una variable. Ahora, podemos usar las otras cuentas como variables independientes, de manera que tendríamos 9 variables independientes.</p>
+<div class="cell" data-execution_count="133">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> data_scale[cuenta_base].values.ravel()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> data_scale[<span class="bu">list</span>(<span class="bu">set</span>(data_scale.columns) <span class="op">-</span> <span class="bu">set</span>(cuenta_base))].values</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.column_stack((X, X_periods))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">0</span>, <span class="st">'linear'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">3</span>, do_plot<span class="op">=</span><span class="st">'Yes'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Tiene resultados bastante buenos. De hecho, si modificas épsilon para reducir el slack puedes alcanzar una regresión casi perfecta. Podría suponer un sobreajuste. Puede también indicar que la correlación, en ese sentido el movimiento de las otras cuentas afecta mucho en el resultado.</p>
+<p>Ahora, una pregunta fundamenta es ¿los valores pasados de mi regresión afectan el resultado actual? para comprobarlo podemos ajustar X como rezagos de la variable a predecir. <span class="math display">\[ X_t = y_{t-1}, y_{t-2} \]</span></p>
+<p>El razonamiento para elegir los dos valores anteriores es porque hablando de contabilidad, es la norma que se maneje por ciclos de tres meses. Es posible que tengan autocorrelación en ese ciclo, por lo tanto, podríamos esperar que los meses previos tengan efecto en el valor actual. Ahora tenemos 11 variables y 55 observaciones.</p>
+<div class="cell" data-execution_count="134">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>timesteps <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>train_data <span class="op">=</span> data_scale[cuenta_base].values.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>train_data_timesteps <span class="op">=</span> np.array([[j <span class="cf">for</span> j <span class="kw">in</span> train_data[i:i<span class="op">+</span>timesteps]]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                                    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="bu">len</span>(train_data)<span class="op">-</span>timesteps<span class="op">+</span><span class="dv">1</span>)])[:,:,<span class="dv">0</span>]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>train_data_timesteps.shape</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> train_data_timesteps[:,:timesteps<span class="op">-</span><span class="dv">1</span>], train_data_timesteps[:,[timesteps<span class="op">-</span><span class="dv">1</span>]]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> y.ravel()</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>X_others <span class="op">=</span> data_scale[<span class="bu">list</span>(<span class="bu">set</span>(data_scale.columns) <span class="op">-</span> <span class="bu">set</span>(cuenta_base))].values[timesteps<span class="op">-</span><span class="dv">1</span>:,:]</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.column_stack((X_periods[timesteps<span class="op">-</span><span class="dv">1</span>:], X, X_others))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">0</span>, <span class="st">'linear'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">3</span>, do_plot<span class="op">=</span><span class="st">'Yes'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Los resultados de ajuste y error empeoraron ligeramente comparado con el data set pasado.</p>
+<p>Ya que en la realidad no podemos utilizar los datos en <span class="math inline">\(t\)</span> de otras cuentas para predecir de la cuenta objetivo <span class="math inline">\(t\)</span>, porque ya es muy tarde. Lo que podemos hacer es utilizar el periodo anterior $ X_{t-1} $ de las demás variables independientes para estimar $ y_{t} $</p>
+<div class="cell" data-execution_count="135">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> data_scale[cuenta_base].values[<span class="dv">1</span>:]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> y.ravel()</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>X_others <span class="op">=</span> data_scale[<span class="bu">list</span>(<span class="bu">set</span>(data_scale.columns) <span class="op">-</span> <span class="bu">set</span>(cuenta_base))].values[:<span class="op">-</span><span class="dv">1</span>,:]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.column_stack((X_periods[<span class="dv">1</span>:], X_others))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">0</span>, <span class="st">'linear'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">3</span>, do_plot<span class="op">=</span><span class="st">'Yes'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Usualmente los meses que también son fin de cuarto tiene mayor relevancia en los resultados. Puede ser por cuestiones operativas, de mercado, o incluso de ventas. Es por eso que si tenemos una variable categórica que pueda indicar el periodo que indica el fin de cuarto entonces es posible que para los datos sea lo suficientemente relevante.</p>
+<div class="cell" data-execution_count="136">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> data_scale[cuenta_base].values[<span class="dv">1</span>:]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> y.ravel()</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>X_others <span class="op">=</span> data_scale[<span class="bu">list</span>(<span class="bu">set</span>(data_scale.columns) <span class="op">-</span> <span class="bu">set</span>(cuenta_base))].values[:<span class="op">-</span><span class="dv">1</span>,:]</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>X_q <span class="op">=</span> [<span class="dv">1</span> <span class="cf">if</span> x<span class="op">%</span><span class="dv">3</span> <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span> <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(X_periods))]</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>X_q <span class="op">=</span> np.array(X_q[<span class="dv">1</span>:])</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.column_stack((X_periods[<span class="dv">1</span>:], X_others, X_q))</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">0</span>, <span class="st">'linear'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">3</span>, do_plot<span class="op">=</span><span class="st">'Yes'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>El data set que usa las otras cuentas como variable exógena tiene la mejor precisión, casi perfecta. Sin embargo, es muy improbable que funcione en la realidad por que, para cualquier mes, cuando tu tienes la variable los valores de las variables exógenas es muy tarde para predecir la variable dependiente.</p>
+<p>El data set que arrojo los mejores resultados y que se puede usar para pronosticar el siguiente periodo es el que incluye las otras cuentas rezagadas en un periodo, más la variable categórica que indica el fin de cuarto.</p>
+<p>Ahora que sabemos que características funcionan mejor para nuestro modelo, podemos evaluar y comparar cada una de las implementaciones de regresores en máquinas de soporte. Y lo mismo para cada una de las cuentas de nuestro interés.</p>
+<p>Las implementaciones que evaluaremos es la librería <strong>Sklearn.smv.SVR con kernel lineal, rbf y polinomial</strong>.</p>
+<p>Para <strong>LS-SVM</strong>, el doctor en física Danny Vanpoucke realizó una implementación basada en los modelos de sklearn para un regresor. Eso significa que su implementación es muy parecida y compatible con los modelos de sklearn. El siguiente código es la clase LS-SVM.</p>
+</section>
+</section>
+<section id="modelo-de-regresión" class="level2">
+<h2 class="anchored" data-anchor-id="modelo-de-regresión">Modelo de regresión</h2>
+<div class="cell" data-execution_count="137">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_data_sets(acc):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">#arrange y and X</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> data_scale[acc].values[<span class="dv">1</span>:]</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> y.ravel()</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    X_others <span class="op">=</span> data_scale[<span class="bu">list</span>(<span class="bu">set</span>(data_scale.columns) <span class="op">-</span> <span class="bu">set</span>(acc))].values[:<span class="op">-</span><span class="dv">1</span>,:]</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    X_q <span class="op">=</span> [<span class="dv">1</span> <span class="cf">if</span> x<span class="op">%</span><span class="dv">3</span> <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span> <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(X_periods))]</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    X_q <span class="op">=</span> np.array(X_q[<span class="dv">1</span>:])</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> np.column_stack((X_periods[<span class="dv">1</span>:], X_others, X_q))</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X, y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="138">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -*- coding: utf-8 -*-</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">Created on Tue May 19 09:27:21 2020</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">An LS-SVM regression class following the sk-learn API.</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">_                         _   _   _    _  _</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">| 0          1^T_N         |  | b  |   | 0 |</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">|                          |  |    | = |   |</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">| 1_N  Omega+gamma^-1 I_N  |  | a  |   | Y |</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">|_                        _|  |_  _|   |_ _|</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">Omega= Kernel K(x_i,x_j)</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">gamma= hyper-parameter (is a ratio z/µ with z the sum squared error and µ the</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">                        amount of regularization)</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">1_N = vector (1,1,1,..,1)</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">I_N = NxN unity matrix</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">@author: Dr. Dr. Danny E. P. Vanpoucke</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">@web   : https://dannyvanpoucke.be</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.base <span class="im">import</span> BaseEstimator, RegressorMixin</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LSSVMRegression(BaseEstimator, RegressorMixin):</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">    An Least Squared Support Vector Machine (LS-SVM) regression class, build</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co">    on the BaseEstimator and RegressorMixin base classes of sklearn.</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co">    (Let's hope furture upgrades of python sk-learn just doesn't break this...</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co">    consider this a python feature)</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="co">    Attributes:</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="co">        - gamma : the hyper-parameter (float)</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="co">        - kernel: the kernel used     (string)</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="co">        - kernel_: the actual kernel function</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="co">        - x : the data on which the LSSVM is trained (call it support vectors)</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="co">        - y : the targets for the training data</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co">        - coef_ : coefficents of the support vectors</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="co">        - intercept_ : intercept term</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, gamma: <span class="bu">float</span> <span class="op">=</span> <span class="fl">1.0</span>, kernel: <span class="bu">str</span> <span class="op">=</span> <span class="va">None</span>, c: <span class="bu">float</span> <span class="op">=</span> <span class="fl">1.0</span>,</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>                 d: <span class="bu">float</span> <span class="op">=</span> <span class="dv">2</span>, sigma: <span class="bu">float</span> <span class="op">=</span> <span class="fl">1.0</span>):</span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="co">        Create a new regressor</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="co">        Parameters:</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="co">            - gamma: floating point value for the hyper-parameter gamma, DEFAULT=1.0</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="co">            - kernel: string indicating the kernel: {'linear','poly','rbf'}, DEFAULT='rbf'</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="co">            - the kernel parameters</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="co">                    * linear: none</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="co">                    * poly:</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="co">                        + c: scaling constant, DEFAULT=1.0</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="co">                        + d: polynomial power, DEFAULT=2</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="co">                    * rbf:</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="co">                        + sigma: scaling constant, DEFAULT=1.0</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.gamma <span class="op">=</span> gamma</span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.c <span class="op">=</span> c</span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.d <span class="op">=</span> d</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.sigma <span class="op">=</span> sigma</span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> kernel <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.kernel <span class="op">=</span> <span class="st">'rbf'</span></span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.kernel <span class="op">=</span> kernel</span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>        params <span class="op">=</span> <span class="bu">dict</span>()</span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> kernel <span class="op">==</span> <span class="st">'poly'</span>:</span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>            params[<span class="st">'c'</span>] <span class="op">=</span> c</span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a>            params[<span class="st">'d'</span>] <span class="op">=</span> d</span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> kernel <span class="op">==</span> <span class="st">'rbf'</span>:</span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>            params[<span class="st">'sigma'</span>] <span class="op">=</span> sigma</span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.kernel_ <span class="op">=</span> LSSVMRegression.__set_kernel(<span class="va">self</span>.kernel, <span class="op">**</span>params)</span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a>        <span class="co">#model parameters</span></span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.y <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.coef_ <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.intercept_ <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_params(<span class="va">self</span>, deep<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a><span class="co">            The get_params functionality provides the parameters of the LSSVMRegression class.</span></span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a><span class="co">            These exclude the modelparameters.</span></span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">"c"</span>: <span class="va">self</span>.c, <span class="st">"d"</span>: <span class="va">self</span>.d, <span class="st">"gamma"</span>: <span class="va">self</span>.gamma,</span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a>                <span class="st">"kernel"</span>: <span class="va">self</span>.kernel, <span class="st">"sigma"</span>:<span class="va">self</span>.sigma}</span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> set_params(<span class="va">self</span>, <span class="op">**</span>parameters):</span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a><span class="co">            Set the parameters of the class. Important note: This should do</span></span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a><span class="co">            anything that is done to relevant parameters in __init__ as</span></span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a><span class="co">            sklearn's GridSearchCV uses this instead of init.</span></span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a><span class="co">            More info:  https://scikit-learn.org/stable/developers/develop.html</span></span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print("SETTING PARAMETERS IN LSSVM:",parameters.items())</span></span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> parameter, value <span class="kw">in</span> parameters.items():</span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a>            <span class="co">#setattr should do the trick for gamma,c,d,sigma and kernel</span></span>
+<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a>            <span class="bu">setattr</span>(<span class="va">self</span>, parameter, value)</span>
+<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a>        <span class="co">#now also update the actual kernel</span></span>
+<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a>        params <span class="op">=</span> <span class="bu">dict</span>()</span>
+<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.kernel <span class="op">==</span> <span class="st">'poly'</span>:</span>
+<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a>            params[<span class="st">'c'</span>] <span class="op">=</span> <span class="va">self</span>.c</span>
+<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a>            params[<span class="st">'d'</span>] <span class="op">=</span> <span class="va">self</span>.d</span>
+<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.kernel <span class="op">==</span> <span class="st">'rbf'</span>:</span>
+<span id="cb11-103"><a href="#cb11-103" aria-hidden="true" tabindex="-1"></a>            params[<span class="st">'sigma'</span>] <span class="op">=</span> <span class="va">self</span>.sigma</span>
+<span id="cb11-104"><a href="#cb11-104" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.kernel_ <span class="op">=</span> LSSVMRegression.__set_kernel(<span class="va">self</span>.kernel, <span class="op">**</span>params)</span>
+<span id="cb11-105"><a href="#cb11-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-106"><a href="#cb11-106" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span></span>
+<span id="cb11-107"><a href="#cb11-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-108"><a href="#cb11-108" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> set_attributes(<span class="va">self</span>, <span class="op">**</span>parameters):</span>
+<span id="cb11-109"><a href="#cb11-109" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
+<span id="cb11-110"><a href="#cb11-110" aria-hidden="true" tabindex="-1"></a><span class="co">            Manually set the attributes of the model. This should generally</span></span>
+<span id="cb11-111"><a href="#cb11-111" aria-hidden="true" tabindex="-1"></a><span class="co">            not be done, except when testing some specific behaviour, or</span></span>
+<span id="cb11-112"><a href="#cb11-112" aria-hidden="true" tabindex="-1"></a><span class="co">            creating an averaged model.</span></span>
+<span id="cb11-113"><a href="#cb11-113" aria-hidden="true" tabindex="-1"></a><span class="co">            Parameters are provided as a dictionary.</span></span>
+<span id="cb11-114"><a href="#cb11-114" aria-hidden="true" tabindex="-1"></a><span class="co">                - 'intercept_' : float intercept</span></span>
+<span id="cb11-115"><a href="#cb11-115" aria-hidden="true" tabindex="-1"></a><span class="co">                - 'coef_'      : float array of coefficients</span></span>
+<span id="cb11-116"><a href="#cb11-116" aria-hidden="true" tabindex="-1"></a><span class="co">                - 'support_'   : array of support vectors, in the same order sorted</span></span>
+<span id="cb11-117"><a href="#cb11-117" aria-hidden="true" tabindex="-1"></a><span class="co">                                 as the coefficients</span></span>
+<span id="cb11-118"><a href="#cb11-118" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span>
+<span id="cb11-119"><a href="#cb11-119" aria-hidden="true" tabindex="-1"></a>        <span class="co">#not the most efficient way of doing it...but sufficient for the time being</span></span>
+<span id="cb11-120"><a href="#cb11-120" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> param, value <span class="kw">in</span> parameters.items():</span>
+<span id="cb11-121"><a href="#cb11-121" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> param <span class="op">==</span> <span class="st">'intercept_'</span>:</span>
+<span id="cb11-122"><a href="#cb11-122" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.intercept_ <span class="op">=</span> value</span>
+<span id="cb11-123"><a href="#cb11-123" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> param <span class="op">==</span> <span class="st">'coef_'</span>:</span>
+<span id="cb11-124"><a href="#cb11-124" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.coef_ <span class="op">=</span> value</span>
+<span id="cb11-125"><a href="#cb11-125" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> param <span class="op">==</span> <span class="st">'support_'</span>:</span>
+<span id="cb11-126"><a href="#cb11-126" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.x <span class="op">=</span> value</span>
+<span id="cb11-127"><a href="#cb11-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-128"><a href="#cb11-128" aria-hidden="true" tabindex="-1"></a>    <span class="at">@staticmethod</span></span>
+<span id="cb11-129"><a href="#cb11-129" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> __set_kernel(name: <span class="bu">str</span>, <span class="op">**</span>params):</span>
+<span id="cb11-130"><a href="#cb11-130" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
+<span id="cb11-131"><a href="#cb11-131" aria-hidden="true" tabindex="-1"></a><span class="co">            Internal static function to set the kernel function.</span></span>
+<span id="cb11-132"><a href="#cb11-132" aria-hidden="true" tabindex="-1"></a><span class="co">            </span><span class="al">NOTE</span><span class="co">: The second "vector" xj will be the one which generally</span></span>
+<span id="cb11-133"><a href="#cb11-133" aria-hidden="true" tabindex="-1"></a><span class="co">                  contains an array of possible vectors, while xi should be a single</span></span>
+<span id="cb11-134"><a href="#cb11-134" aria-hidden="true" tabindex="-1"></a><span class="co">                  vector. Therefore, the numpy dot-product requires xj to</span></span>
+<span id="cb11-135"><a href="#cb11-135" aria-hidden="true" tabindex="-1"></a><span class="co">                  be transposed.</span></span>
+<span id="cb11-136"><a href="#cb11-136" aria-hidden="true" tabindex="-1"></a><span class="co">            The kernel returns either a scalar or a numpy nd-array of</span></span>
+<span id="cb11-137"><a href="#cb11-137" aria-hidden="true" tabindex="-1"></a><span class="co">            rank 1 (i.e. a vector), if it returns something else the result</span></span>
+<span id="cb11-138"><a href="#cb11-138" aria-hidden="true" tabindex="-1"></a><span class="co">            is wrong if xi is an array.</span></span>
+<span id="cb11-139"><a href="#cb11-139" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span>
+<span id="cb11-140"><a href="#cb11-140" aria-hidden="true" tabindex="-1"></a>        <span class="kw">def</span> linear(xi, xj):</span>
+<span id="cb11-141"><a href="#cb11-141" aria-hidden="true" tabindex="-1"></a>            <span class="co">"""</span></span>
+<span id="cb11-142"><a href="#cb11-142" aria-hidden="true" tabindex="-1"></a><span class="co">               v*v=scal (dot-product OK)</span></span>
+<span id="cb11-143"><a href="#cb11-143" aria-hidden="true" tabindex="-1"></a><span class="co">               v*m=v    (dot-product OK)</span></span>
+<span id="cb11-144"><a href="#cb11-144" aria-hidden="true" tabindex="-1"></a><span class="co">               m*m=m    (matmul for 2Dx2D, ok with dot-product)</span></span>
+<span id="cb11-145"><a href="#cb11-145" aria-hidden="true" tabindex="-1"></a><span class="co">            """</span></span>
+<span id="cb11-146"><a href="#cb11-146" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> np.dot(xi, xj.T)</span>
+<span id="cb11-147"><a href="#cb11-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-148"><a href="#cb11-148" aria-hidden="true" tabindex="-1"></a>        <span class="kw">def</span> poly(xi, xj, c<span class="op">=</span>params.get(<span class="st">'c'</span>, <span class="fl">1.0</span>), d<span class="op">=</span>params.get(<span class="st">'d'</span>, <span class="dv">2</span>)):</span>
+<span id="cb11-149"><a href="#cb11-149" aria-hidden="true" tabindex="-1"></a>            <span class="co">"""</span></span>
+<span id="cb11-150"><a href="#cb11-150" aria-hidden="true" tabindex="-1"></a><span class="co">                Polynomial kernel ={1+ (xi*xj^T)/c }^d</span></span>
+<span id="cb11-151"><a href="#cb11-151" aria-hidden="true" tabindex="-1"></a><span class="co">                Parameters:</span></span>
+<span id="cb11-152"><a href="#cb11-152" aria-hidden="true" tabindex="-1"></a><span class="co">                    - c: scaling constant, DEFAULT=1.0</span></span>
+<span id="cb11-153"><a href="#cb11-153" aria-hidden="true" tabindex="-1"></a><span class="co">                    - d: polynomial power, DEFAULT=2</span></span>
+<span id="cb11-154"><a href="#cb11-154" aria-hidden="true" tabindex="-1"></a><span class="co">                    - xi and xj are numpy nd-arrays</span></span>
+<span id="cb11-155"><a href="#cb11-155" aria-hidden="true" tabindex="-1"></a><span class="co">                (cf: https://en.wikipedia.org/wiki/Least-squares_support-vector_machine )</span></span>
+<span id="cb11-156"><a href="#cb11-156" aria-hidden="true" tabindex="-1"></a><span class="co">                works on same as linear</span></span>
+<span id="cb11-157"><a href="#cb11-157" aria-hidden="true" tabindex="-1"></a><span class="co">            """</span></span>
+<span id="cb11-158"><a href="#cb11-158" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> ((np.dot(xi, xj.T))<span class="op">/</span>c  <span class="op">+</span> <span class="dv">1</span>)<span class="op">**</span>d</span>
+<span id="cb11-159"><a href="#cb11-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-160"><a href="#cb11-160" aria-hidden="true" tabindex="-1"></a>        <span class="kw">def</span> rbf(xi, xj, sigma<span class="op">=</span>params.get(<span class="st">'sigma'</span>, <span class="fl">1.0</span>)):</span>
+<span id="cb11-161"><a href="#cb11-161" aria-hidden="true" tabindex="-1"></a>            <span class="co">"""</span></span>
+<span id="cb11-162"><a href="#cb11-162" aria-hidden="true" tabindex="-1"></a><span class="co">            Radial Basis Function kernel= exp(- ||xj-xi||² / (2*sigma²))</span></span>
+<span id="cb11-163"><a href="#cb11-163" aria-hidden="true" tabindex="-1"></a><span class="co">            In this formulation, the rbf is also known as the Gaussian kernel of variance sigma²</span></span>
+<span id="cb11-164"><a href="#cb11-164" aria-hidden="true" tabindex="-1"></a><span class="co">            As the Euclidean distance is strict positive, the results of this kernel</span></span>
+<span id="cb11-165"><a href="#cb11-165" aria-hidden="true" tabindex="-1"></a><span class="co">            are in the range [0..1] (x € [+infty..0])</span></span>
+<span id="cb11-166"><a href="#cb11-166" aria-hidden="true" tabindex="-1"></a><span class="co">            Parameters:</span></span>
+<span id="cb11-167"><a href="#cb11-167" aria-hidden="true" tabindex="-1"></a><span class="co">                - sigma: scaling constant, DEFAULT=1.0</span></span>
+<span id="cb11-168"><a href="#cb11-168" aria-hidden="true" tabindex="-1"></a><span class="co">                - xi and xj are numpy nd-arrays</span></span>
+<span id="cb11-169"><a href="#cb11-169" aria-hidden="true" tabindex="-1"></a><span class="co">            (cf: https://en.wikipedia.org/wiki/Least-squares_support-vector_machine )</span></span>
+<span id="cb11-170"><a href="#cb11-170" aria-hidden="true" tabindex="-1"></a><span class="co">            Possible combinations of xi and xj:</span></span>
+<span id="cb11-171"><a href="#cb11-171" aria-hidden="true" tabindex="-1"></a><span class="co">                vect &amp; vect   -&gt; scalar</span></span>
+<span id="cb11-172"><a href="#cb11-172" aria-hidden="true" tabindex="-1"></a><span class="co">                vect &amp; array  -&gt; vect</span></span>
+<span id="cb11-173"><a href="#cb11-173" aria-hidden="true" tabindex="-1"></a><span class="co">                array &amp; array -&gt; array =&gt; this one requires a pair distance...</span></span>
+<span id="cb11-174"><a href="#cb11-174" aria-hidden="true" tabindex="-1"></a><span class="co">                                    which can not be done with matmul and dot</span></span>
+<span id="cb11-175"><a href="#cb11-175" aria-hidden="true" tabindex="-1"></a><span class="co">                The vectors are the rows of the arrays (Arr[0,:]=first vect)</span></span>
+<span id="cb11-176"><a href="#cb11-176" aria-hidden="true" tabindex="-1"></a><span class="co">                The squared distance between vectors= sqr(sqrt( sum_i(vi-wi)² ))</span></span>
+<span id="cb11-177"><a href="#cb11-177" aria-hidden="true" tabindex="-1"></a><span class="co">                --&gt; sqr &amp; sqrt cancel</span></span>
+<span id="cb11-178"><a href="#cb11-178" aria-hidden="true" tabindex="-1"></a><span class="co">                --&gt; you could use a dot-product operator for vectors...but this</span></span>
+<span id="cb11-179"><a href="#cb11-179" aria-hidden="true" tabindex="-1"></a><span class="co">                seems to fail for nd-arrays.</span></span>
+<span id="cb11-180"><a href="#cb11-180" aria-hidden="true" tabindex="-1"></a><span class="co">            For vectors:</span></span>
+<span id="cb11-181"><a href="#cb11-181" aria-hidden="true" tabindex="-1"></a><span class="co">                ||x-y||²=sum_i(x_i-y_i)²=sum_i(x²_i+y²_i-2x_iy_i)</span></span>
+<span id="cb11-182"><a href="#cb11-182" aria-hidden="true" tabindex="-1"></a><span class="co">                --&gt; all products between vectors can be done via np.dot: takes the squares &amp; sum</span></span>
+<span id="cb11-183"><a href="#cb11-183" aria-hidden="true" tabindex="-1"></a><span class="co">            For vector x and array of vectors y:</span></span>
+<span id="cb11-184"><a href="#cb11-184" aria-hidden="true" tabindex="-1"></a><span class="co">                --&gt; x²_i : these are vectors: dot gives a scalar</span></span>
+<span id="cb11-185"><a href="#cb11-185" aria-hidden="true" tabindex="-1"></a><span class="co">                --&gt; y²_i : this should be a list of scalars, one per vector.</span></span>
+<span id="cb11-186"><a href="#cb11-186" aria-hidden="true" tabindex="-1"></a><span class="co">                            =&gt; np.dot gives a 2d array</span></span>
+<span id="cb11-187"><a href="#cb11-187" aria-hidden="true" tabindex="-1"></a><span class="co">                            =&gt; so   1) square manually (squares each element)</span></span>
+<span id="cb11-188"><a href="#cb11-188" aria-hidden="true" tabindex="-1"></a><span class="co">                                    2) sum over every row (axis=1...but only in case we</span></span>
+<span id="cb11-189"><a href="#cb11-189" aria-hidden="true" tabindex="-1"></a><span class="co">                                                           have a 2D array)</span></span>
+<span id="cb11-190"><a href="#cb11-190" aria-hidden="true" tabindex="-1"></a><span class="co">                --&gt; x_iy_i : this should also be a list of scalars. np.dot does the trick,</span></span>
+<span id="cb11-191"><a href="#cb11-191" aria-hidden="true" tabindex="-1"></a><span class="co">                            and even gives the same result if matrix and vector are exchanged</span></span>
+<span id="cb11-192"><a href="#cb11-192" aria-hidden="true" tabindex="-1"></a><span class="co">            for array of vectors x and array of vectors y:</span></span>
+<span id="cb11-193"><a href="#cb11-193" aria-hidden="true" tabindex="-1"></a><span class="co">                --&gt; either loop over vectors of x, and for each do the above</span></span>
+<span id="cb11-194"><a href="#cb11-194" aria-hidden="true" tabindex="-1"></a><span class="co">                --&gt; or use cdist which calculates the pairwise distance and use that in the exp</span></span>
+<span id="cb11-195"><a href="#cb11-195" aria-hidden="true" tabindex="-1"></a><span class="co">            """</span></span>
+<span id="cb11-196"><a href="#cb11-196" aria-hidden="true" tabindex="-1"></a>            <span class="im">from</span> scipy.spatial.distance <span class="im">import</span> cdist</span>
+<span id="cb11-197"><a href="#cb11-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-198"><a href="#cb11-198" aria-hidden="true" tabindex="-1"></a>           <span class="co"># print('LS_SVM DEBUG: Sigma=',sigma,'  type=',type(sigma) )</span></span>
+<span id="cb11-199"><a href="#cb11-199" aria-hidden="true" tabindex="-1"></a>           <span class="co"># print('              xi   =',xi,'  type=',type(xi))</span></span>
+<span id="cb11-200"><a href="#cb11-200" aria-hidden="true" tabindex="-1"></a>           <span class="co"># print('              xj   =',xj,'  type=',type(xj))</span></span>
+<span id="cb11-201"><a href="#cb11-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-202"><a href="#cb11-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-203"><a href="#cb11-203" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (xi.ndim <span class="op">==</span> <span class="dv">2</span> <span class="kw">and</span> xi.ndim <span class="op">==</span> xj.ndim): <span class="co"># both are 2D matrices</span></span>
+<span id="cb11-204"><a href="#cb11-204" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> np.exp(<span class="op">-</span>(cdist(xi, xj, metric<span class="op">=</span><span class="st">'sqeuclidean'</span>))<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>(sigma<span class="op">**</span><span class="dv">2</span>)))</span>
+<span id="cb11-205"><a href="#cb11-205" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> ((xi.ndim <span class="op">&lt;</span> <span class="dv">2</span>) <span class="kw">and</span> (xj.ndim <span class="op">&lt;</span> <span class="dv">3</span>)):</span>
+<span id="cb11-206"><a href="#cb11-206" aria-hidden="true" tabindex="-1"></a>                ax <span class="op">=</span> <span class="bu">len</span>(xj.shape)<span class="op">-</span><span class="dv">1</span> <span class="co">#compensate for python zero-base</span></span>
+<span id="cb11-207"><a href="#cb11-207" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> np.exp(<span class="op">-</span>(np.dot(xi, xi) <span class="op">+</span> (xj<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>(axis<span class="op">=</span>ax)</span>
+<span id="cb11-208"><a href="#cb11-208" aria-hidden="true" tabindex="-1"></a>                                <span class="op">-</span> <span class="dv">2</span><span class="op">*</span>np.dot(xi, xj.T))<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>(sigma<span class="op">**</span><span class="dv">2</span>)))</span>
+<span id="cb11-209"><a href="#cb11-209" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb11-210"><a href="#cb11-210" aria-hidden="true" tabindex="-1"></a>                message <span class="op">=</span> <span class="st">"The rbf kernel is not suited for arrays with rank &gt;2"</span></span>
+<span id="cb11-211"><a href="#cb11-211" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">Exception</span>(message)</span>
+<span id="cb11-212"><a href="#cb11-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-213"><a href="#cb11-213" aria-hidden="true" tabindex="-1"></a>        kernels <span class="op">=</span> {<span class="st">'linear'</span>: linear, <span class="st">'poly'</span>: poly, <span class="st">'rbf'</span>: rbf}</span>
+<span id="cb11-214"><a href="#cb11-214" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> kernels.get(name) <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb11-215"><a href="#cb11-215" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> kernels[name]</span>
+<span id="cb11-216"><a href="#cb11-216" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>: <span class="co">#unknown kernel: crash and burn?</span></span>
+<span id="cb11-217"><a href="#cb11-217" aria-hidden="true" tabindex="-1"></a>            message <span class="op">=</span> <span class="st">"Kernel "</span><span class="op">+</span>name<span class="op">+</span><span class="st">" is not implemented. Please choose from : "</span></span>
+<span id="cb11-218"><a href="#cb11-218" aria-hidden="true" tabindex="-1"></a>            message <span class="op">+=</span> <span class="bu">str</span>(<span class="bu">list</span>(kernels.keys())).strip(<span class="st">'[]'</span>)</span>
+<span id="cb11-219"><a href="#cb11-219" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">KeyError</span>(message)</span>
+<span id="cb11-220"><a href="#cb11-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-221"><a href="#cb11-221" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> __OptimizeParams(<span class="va">self</span>):</span>
+<span id="cb11-222"><a href="#cb11-222" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
+<span id="cb11-223"><a href="#cb11-223" aria-hidden="true" tabindex="-1"></a><span class="co">        Solve the matrix operation to get the coefficients.</span></span>
+<span id="cb11-224"><a href="#cb11-224" aria-hidden="true" tabindex="-1"></a><span class="co">        --&gt; equation 3.5 and 3.6 of the book by Suykens</span></span>
+<span id="cb11-225"><a href="#cb11-225" aria-hidden="true" tabindex="-1"></a><span class="co">        ==&gt; that is for classification, for regression slightly different cf Dilmen paper 2017</span></span>
+<span id="cb11-226"><a href="#cb11-226" aria-hidden="true" tabindex="-1"></a><span class="co">        self.y: 1D array</span></span>
+<span id="cb11-227"><a href="#cb11-227" aria-hidden="true" tabindex="-1"></a><span class="co">        self.X: 2D array (with rows the vectors: X[0,:] first vector)</span></span>
+<span id="cb11-228"><a href="#cb11-228" aria-hidden="true" tabindex="-1"></a><span class="co">        Set the class parameters:</span></span>
+<span id="cb11-229"><a href="#cb11-229" aria-hidden="true" tabindex="-1"></a><span class="co">            - self.intercept_ : intercept</span></span>
+<span id="cb11-230"><a href="#cb11-230" aria-hidden="true" tabindex="-1"></a><span class="co">            - self.coef_      : coefficients</span></span>
+<span id="cb11-231"><a href="#cb11-231" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span>
+<span id="cb11-232"><a href="#cb11-232" aria-hidden="true" tabindex="-1"></a>        <span class="co">#eq 3.6: Omega_kl = y_ky_lK(x_k,x_l)</span></span>
+<span id="cb11-233"><a href="#cb11-233" aria-hidden="true" tabindex="-1"></a>        <span class="co"># !! note that the product of a vector and the transposed is a dot-product</span></span>
+<span id="cb11-234"><a href="#cb11-234" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    and we need an outer product</span></span>
+<span id="cb11-235"><a href="#cb11-235" aria-hidden="true" tabindex="-1"></a>        <span class="co">#For classification and Regression, the matrices are slightly different...</span></span>
+<span id="cb11-236"><a href="#cb11-236" aria-hidden="true" tabindex="-1"></a>        <span class="co"># (why? except for what came out of solving equations?</span></span>
+<span id="cb11-237"><a href="#cb11-237" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Dilmen et al, IFAC PapersOnline 50(1), 8642-8647 (2017))</span></span>
+<span id="cb11-238"><a href="#cb11-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-239"><a href="#cb11-239" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Classification</span></span>
+<span id="cb11-240"><a href="#cb11-240" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Omega = np.multiply( np.multiply.outer(y,y), self.kernel_(X,X) ) # correct version</span></span>
+<span id="cb11-241"><a href="#cb11-241" aria-hidden="true" tabindex="-1"></a>        <span class="co">#A_dag = np.linalg.pinv(np.block([</span></span>
+<span id="cb11-242"><a href="#cb11-242" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    [0,                           y.T                   ],</span></span>
+<span id="cb11-243"><a href="#cb11-243" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    [y,   Omega + self.gamma**-1 * np.eye(len(y_values))]</span></span>
+<span id="cb11-244"><a href="#cb11-244" aria-hidden="true" tabindex="-1"></a>        <span class="co">#])) #need to check if the matrix is OK--&gt; y.T parts</span></span>
+<span id="cb11-245"><a href="#cb11-245" aria-hidden="true" tabindex="-1"></a>        <span class="co">#B = np.array([0]+[1]*len(y_values))</span></span>
+<span id="cb11-246"><a href="#cb11-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-247"><a href="#cb11-247" aria-hidden="true" tabindex="-1"></a>        <span class="co">#Regression</span></span>
+<span id="cb11-248"><a href="#cb11-248" aria-hidden="true" tabindex="-1"></a>        Omega <span class="op">=</span> <span class="va">self</span>.kernel_(<span class="va">self</span>.x, <span class="va">self</span>.x)</span>
+<span id="cb11-249"><a href="#cb11-249" aria-hidden="true" tabindex="-1"></a>        Ones <span class="op">=</span> np.array([[<span class="dv">1</span>]]<span class="op">*</span><span class="bu">len</span>(<span class="va">self</span>.y)) <span class="co"># needs to be a 2D 1-column vector, hence [[ ]]</span></span>
+<span id="cb11-250"><a href="#cb11-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-251"><a href="#cb11-251" aria-hidden="true" tabindex="-1"></a>        A_dag <span class="op">=</span> np.linalg.pinv(np.block([</span>
+<span id="cb11-252"><a href="#cb11-252" aria-hidden="true" tabindex="-1"></a>            [<span class="dv">0</span>,                           Ones.T                      ],</span>
+<span id="cb11-253"><a href="#cb11-253" aria-hidden="true" tabindex="-1"></a>            [Ones,   Omega <span class="op">+</span> <span class="va">self</span>.gamma<span class="op">**-</span><span class="dv">1</span> <span class="op">*</span> np.identity(<span class="bu">len</span>(<span class="va">self</span>.y))]</span>
+<span id="cb11-254"><a href="#cb11-254" aria-hidden="true" tabindex="-1"></a>        ])) <span class="co">#need to check if the matrix is OK--&gt; y.T parts</span></span>
+<span id="cb11-255"><a href="#cb11-255" aria-hidden="true" tabindex="-1"></a>        B <span class="op">=</span> np.concatenate((np.array([<span class="dv">0</span>]), <span class="va">self</span>.y), axis<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb11-256"><a href="#cb11-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-257"><a href="#cb11-257" aria-hidden="true" tabindex="-1"></a>        solution <span class="op">=</span> np.dot(A_dag, B)</span>
+<span id="cb11-258"><a href="#cb11-258" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.intercept_ <span class="op">=</span> solution[<span class="dv">0</span>]</span>
+<span id="cb11-259"><a href="#cb11-259" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.coef_      <span class="op">=</span> solution[<span class="dv">1</span>:]</span>
+<span id="cb11-260"><a href="#cb11-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-261"><a href="#cb11-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-262"><a href="#cb11-262" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> fit(<span class="va">self</span>, X: np.ndarray, y: np.ndarray):</span>
+<span id="cb11-263"><a href="#cb11-263" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
+<span id="cb11-264"><a href="#cb11-264" aria-hidden="true" tabindex="-1"></a><span class="co">        Fit the parameters based on the support vectors X (and store these as they are</span></span>
+<span id="cb11-265"><a href="#cb11-265" aria-hidden="true" tabindex="-1"></a><span class="co">        parameters of the LS-SVM as well, because needed for prediction)</span></span>
+<span id="cb11-266"><a href="#cb11-266" aria-hidden="true" tabindex="-1"></a><span class="co">        We are doing Regression.</span></span>
+<span id="cb11-267"><a href="#cb11-267" aria-hidden="true" tabindex="-1"></a><span class="co">        Parameters:</span></span>
+<span id="cb11-268"><a href="#cb11-268" aria-hidden="true" tabindex="-1"></a><span class="co">            - X : 2D array of vectors (1 per row: X[0,:] first vector)</span></span>
+<span id="cb11-269"><a href="#cb11-269" aria-hidden="true" tabindex="-1"></a><span class="co">            - y : 1D vector of targets</span></span>
+<span id="cb11-270"><a href="#cb11-270" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span>
+<span id="cb11-271"><a href="#cb11-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-272"><a href="#cb11-272" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print("IN FIT==&gt; GAMMA=",self.gamma,"  SIGMA=",self.sigma)</span></span>
+<span id="cb11-273"><a href="#cb11-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-274"><a href="#cb11-274" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(X, (pd.DataFrame, pd.Series)): <span class="co">#checks if X is an instance of either types</span></span>
+<span id="cb11-275"><a href="#cb11-275" aria-hidden="true" tabindex="-1"></a>            Xloc <span class="op">=</span> X.to_numpy()</span>
+<span id="cb11-276"><a href="#cb11-276" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb11-277"><a href="#cb11-277" aria-hidden="true" tabindex="-1"></a>            Xloc <span class="op">=</span> X</span>
+<span id="cb11-278"><a href="#cb11-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-279"><a href="#cb11-279" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(y, (pd.DataFrame, pd.Series)):</span>
+<span id="cb11-280"><a href="#cb11-280" aria-hidden="true" tabindex="-1"></a>            yloc <span class="op">=</span> y.to_numpy()</span>
+<span id="cb11-281"><a href="#cb11-281" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb11-282"><a href="#cb11-282" aria-hidden="true" tabindex="-1"></a>            yloc <span class="op">=</span> y</span>
+<span id="cb11-283"><a href="#cb11-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-284"><a href="#cb11-284" aria-hidden="true" tabindex="-1"></a>        <span class="co">#check the dimensionality of the input</span></span>
+<span id="cb11-285"><a href="#cb11-285" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (Xloc.ndim <span class="op">==</span> <span class="dv">2</span>) <span class="kw">and</span> (yloc.ndim <span class="op">==</span> <span class="dv">1</span>):</span>
+<span id="cb11-286"><a href="#cb11-286" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.x <span class="op">=</span> Xloc</span>
+<span id="cb11-287"><a href="#cb11-287" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.y <span class="op">=</span> yloc</span>
+<span id="cb11-288"><a href="#cb11-288" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.__OptimizeParams()</span>
+<span id="cb11-289"><a href="#cb11-289" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb11-290"><a href="#cb11-290" aria-hidden="true" tabindex="-1"></a>            message <span class="op">=</span> <span class="st">"The fit procedure requires a 2D numpy array of features "</span>\</span>
+<span id="cb11-291"><a href="#cb11-291" aria-hidden="true" tabindex="-1"></a>                <span class="st">"and 1D array of targets"</span></span>
+<span id="cb11-292"><a href="#cb11-292" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">Exception</span>(message)</span>
+<span id="cb11-293"><a href="#cb11-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-294"><a href="#cb11-294" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> predict(<span class="va">self</span>, X: np.ndarray)<span class="op">-&gt;</span>np.ndarray:</span>
+<span id="cb11-295"><a href="#cb11-295" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
+<span id="cb11-296"><a href="#cb11-296" aria-hidden="true" tabindex="-1"></a><span class="co">        Predict the regression values for a set of feature vectors</span></span>
+<span id="cb11-297"><a href="#cb11-297" aria-hidden="true" tabindex="-1"></a><span class="co">        Parameters:</span></span>
+<span id="cb11-298"><a href="#cb11-298" aria-hidden="true" tabindex="-1"></a><span class="co">            - X: ndarray of feature vectors (max: 2D), 1 per row if more than one.</span></span>
+<span id="cb11-299"><a href="#cb11-299" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span>
+<span id="cb11-300"><a href="#cb11-300" aria-hidden="true" tabindex="-1"></a>        Ker <span class="op">=</span> <span class="va">self</span>.kernel_(X, <span class="va">self</span>.x) <span class="co">#second component should be the array of training vectors</span></span>
+<span id="cb11-301"><a href="#cb11-301" aria-hidden="true" tabindex="-1"></a>        Y <span class="op">=</span> np.dot(<span class="va">self</span>.coef_, Ker.T) <span class="op">+</span> <span class="va">self</span>.intercept_</span>
+<span id="cb11-302"><a href="#cb11-302" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="139">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compare_lssvm(X, y, test_window, kernel, gamma, d, do_plot<span class="op">=</span><span class="st">'No'</span>):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">#no split</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> test_window <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># params</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># creating a SVR model class</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        model_svr <span class="op">=</span> LSSVMRegression(kernel<span class="op">=</span>kernel, gamma<span class="op">=</span>gamma, d<span class="op">=</span>d)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Step 2. Training the model</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        model_svr.fit(X, y)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Step 3. Using the model</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        y_hat <span class="op">=</span> model_svr.predict(X)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Step 4. Evaluation of results</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        sv_x <span class="op">=</span> model_svr.coef_</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>        R2 <span class="op">=</span> r2_score(y, y_hat)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>        mse_mtrc <span class="op">=</span> mse(y, y_hat)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> do_plot <span class="op">==</span> <span class="st">'Yes'</span>:</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>            <span class="co"># View the results</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>            plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>,<span class="dv">5</span>))</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>            plt.scatter(y_hat, y, c<span class="op">=</span><span class="st">'b'</span>, label<span class="op">=</span><span class="st">'Estimation'</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>            plt.plot(y, y, c<span class="op">=</span><span class="st">'k'</span>, label<span class="op">=</span><span class="st">'Perfect estimation'</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>            plt.xlabel(<span class="st">'Y estimated'</span>)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>            plt.ylabel(<span class="st">'Y real'</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>            plt.title(<span class="st">'LS '</span> <span class="op">+</span> kernel <span class="op">+</span> <span class="st">' K |MSE = </span><span class="sc">%0.4f</span><span class="st">'</span><span class="op">%</span>mse(y, y_hat) <span class="op">+</span> <span class="st">' |R^2 = </span><span class="sc">%0.4f</span><span class="st">'</span><span class="op">%</span>r2_score(y, y_hat))</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>            plt.legend()</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>            plt.show()</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> mse_mtrc, R2</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">#split test and train</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>        X_train <span class="op">=</span> X[:<span class="op">-</span>test_window]</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>        X_test <span class="op">=</span> X[<span class="bu">len</span>(X) <span class="op">-</span> test_window:]</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>        y_train <span class="op">=</span> y[:<span class="op">-</span>test_window]</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>        y_test <span class="op">=</span> y[<span class="bu">len</span>(y) <span class="op">-</span> test_window:]</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>        <span class="co"># creating a SVR model class</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>        model_svr <span class="op">=</span> LSSVMRegression(kernel<span class="op">=</span>kernel, gamma<span class="op">=</span>gamma, d<span class="op">=</span>d)</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Training the model</span></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>        model_svr.fit(X_train, y_train)</span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>        <span class="co">#Using the model</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>        y_hat <span class="op">=</span> model_svr.predict(X_test)</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>        <span class="co">#return train and test model accuracy</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>        sv_x <span class="op">=</span> model_svr.coef_</span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>        R2_train <span class="op">=</span> r2_score(y_train, model_svr.predict(X_train))</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>        mse_mtrc_train <span class="op">=</span> mse(y_train, model_svr.predict(X_train))</span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>        R2_test <span class="op">=</span> r2_score( y_test, y_hat)</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>        mse_mtrc_test <span class="op">=</span> mse(y_test, y_hat)</span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> do_plot <span class="op">==</span> <span class="st">'Yes'</span>:</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>            plt.scatter(x<span class="op">=</span><span class="bu">range</span>(<span class="bu">len</span>(X_train)), y<span class="op">=</span>y_train, c<span class="op">=</span><span class="st">'b'</span>, label<span class="op">=</span><span class="st">'train'</span>, s<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>            plt.scatter(x<span class="op">=</span><span class="bu">range</span>(<span class="bu">len</span>(X)<span class="op">-</span>test_window,<span class="bu">len</span>(X)), y<span class="op">=</span>y_test, c<span class="op">=</span><span class="st">'g'</span>, label<span class="op">=</span><span class="st">'test'</span>, s<span class="op">=</span><span class="dv">40</span>)</span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>            plt.scatter(x<span class="op">=</span><span class="bu">range</span>(<span class="bu">len</span>(X)<span class="op">-</span>test_window,<span class="bu">len</span>(X)), y<span class="op">=</span>y_hat, c<span class="op">=</span><span class="st">'r'</span>, label<span class="op">=</span><span class="st">'estimated'</span>, s<span class="op">=</span><span class="dv">40</span>)</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>            plt.xlabel(<span class="st">'period month'</span>)</span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>            plt.ylabel(<span class="st">'value'</span>)</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>            plt.title(<span class="st">'LS '</span> <span class="op">+</span> kernel <span class="op">+</span> <span class="st">' K |MSE = </span><span class="sc">%0.3f</span><span class="st">'</span><span class="op">%</span>mse(y_test, y_hat) <span class="op">+</span> <span class="st">' |R^2 = </span><span class="sc">%0.3f</span><span class="st">'</span><span class="op">%</span>r2_score(y_test, y_hat))</span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>            plt.legend()</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>            plt.show()</span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>        <span class="co"># return train and test metrics</span></span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> mse_mtrc_train, R2_train, mse_mtrc_test, <span class="st">'</span><span class="sc">%0.2f</span><span class="st">'</span><span class="op">%</span>R2_test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>La evaluación del modelo será con <span class="math inline">\(R^2\)</span> y <span class="math inline">\(MSE\)</span> el error medio al cuadrado. Pero, primero la introducción a cada unos de las formulaciones y los kernels ya despues hacemos la separación para prueba.</p>
+<div class="cell" data-execution_count="140">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">0</span>, <span class="st">'linear'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">4</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">0</span>, <span class="st">'rbf'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">4</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">0</span>, <span class="st">'poly'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">3</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_lssvm(X, y, <span class="dv">0</span>, <span class="st">'linear'</span>, <span class="dv">1</span>, <span class="dv">4</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_lssvm(X, y, <span class="dv">0</span>, <span class="st">'rbf'</span>, <span class="dv">1</span>, <span class="dv">4</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>_, _ <span class="op">=</span> compare_lssvm(X, y, <span class="dv">0</span>, <span class="st">'poly'</span>, <span class="dv">1</span>, <span class="dv">4</span>, <span class="st">'Yes'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-14-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-14-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-14-output-3.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-14-output-4.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-14-output-5.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-14-output-6.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Se puede apreciar el comportamiento del kernel lineal es similar a lo que esperaríamos en una regresión lineal con errores no auto correlacionados y posiblemente normalizados.</p>
+<p>Pero definitivamente el resultado que llama más la atención es LS - SVM, con Kernel polinomial, de potencia 4, arroja sorprendentemente buenos resultados. Parece que hay un error pero vamos a analizar más a fondo los resultados observando la transformación dependiendo el grado el polinomio. Ahora si, ya seperamos para entrenamiento y prueba.</p>
+<div class="cell" data-execution_count="141">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>mse_ls <span class="op">=</span> []</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>r2_ls <span class="op">=</span> []</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>mse_ls_tst <span class="op">=</span> []</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>r2_ls_tst <span class="op">=</span> []</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>grado <span class="op">=</span> []</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>,<span class="dv">9</span>):</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    mse_ls_i, r2_ls_i, mse_ls_tst_i, r2_ls_tst_i <span class="op">=</span> compare_lssvm(X, y, <span class="dv">2</span>, <span class="st">'poly'</span>, gamma<span class="op">=</span><span class="dv">1</span>, d<span class="op">=</span>i)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    mse_ls.append(mse_ls_i)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    r2_ls.append(r2_ls_i)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    mse_ls_tst.append(mse_ls_tst_i)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    r2_ls_tst.append(r2_ls_tst_i)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    grado.append(i)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>ls_poly_test <span class="op">=</span> np.column_stack((grado,mse_ls, r2_ls, mse_ls_tst, r2_ls_tst))</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>ls_poly_test <span class="op">=</span> pd.DataFrame(ls_poly_test, columns<span class="op">=</span>[<span class="st">'Grado'</span>, <span class="st">'MSE Train'</span>, <span class="st">'R2 Train'</span>, <span class="st">'MSE Test'</span>, <span class="st">'R2 Test'</span>])</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>ls_poly_test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="141">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Grado</th>
+      <th>MSE Train</th>
+      <th>R2 Train</th>
+      <th>MSE Test</th>
+      <th>R2 Test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>0.014413136897247754</td>
+      <td>0.6408475113326302</td>
+      <td>0.23765077790232533</td>
+      <td>-9.73</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>0.00022798851281366812</td>
+      <td>0.994318888223407</td>
+      <td>0.5849660520548985</td>
+      <td>-25.40</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4</td>
+      <td>1.6404226779358462e-06</td>
+      <td>0.9999591232712596</td>
+      <td>760.7476243510694</td>
+      <td>-34336.20</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5</td>
+      <td>0.0019401977069182727</td>
+      <td>0.951653353470924</td>
+      <td>54525.58703193449</td>
+      <td>-2461072.70</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>6</td>
+      <td>0.0069166002823910396</td>
+      <td>0.8276493020049975</td>
+      <td>204565.7527349638</td>
+      <td>-9233304.35</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>7</td>
+      <td>0.010737955829715628</td>
+      <td>0.7324271886865179</td>
+      <td>333046.60382732365</td>
+      <td>-15032432.09</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>8</td>
+      <td>0.017687785177739317</td>
+      <td>0.5592484751316038</td>
+      <td>986523.5861217745</td>
+      <td>-44527850.74</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>La previa tabla muestra que el grado del polinomio 2 es ya bastante acertado a un <span class="math inline">\(R^2\)</span> 0.64. Y el <span class="math inline">\(R^2\)</span> sigue mejorando hasta el grado 4 donde esta básicamente perfecto. Después de eso comienza de decadencia, y en el grado 8 el <span class="math inline">\(R^2\)</span> ya es solo de la mitad.</p>
+<p>Sin embargo, para los datos de prueba los resultados son muy malos con <span class="math inline">\(R^2\)</span> negativo. De acuerdo con la documentación, puede ser negativo por que el modelo es arbitrariamente malo.</p>
+<p>La conclusión es que el kernel polinomial es muy malo para extrapolar con estas series y en el entrenamiento esta sobre ajustado.</p>
+<p>El siguiente paso es hacer lo mismo con todas las variables para observar sus resultados de error cuadrado promedio y ajuste. Como la intención no es encontrar los mejores hiperparámetros, se mantendrá los mismos valores para los hiperparámetros de la siguiente manera: - épsilon: 0.1 - SVR gamma: ‘auto’ - grado polinomial: 2 - LS SVR gamma: 1</p>
+<div class="cell" data-execution_count="142">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>mse_ls <span class="op">=</span> []</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>r2_ls <span class="op">=</span> []</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>formulacion <span class="op">=</span> []</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>account <span class="op">=</span> []</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>kernel <span class="op">=</span> []</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> acc <span class="kw">in</span> data_scale.columns:</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    X, y <span class="op">=</span> build_data_sets(acc)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">#call all the models and save the results and the model and formulation</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    _, _, mse_ls_i, r2_ls_i <span class="op">=</span> compare_svr(X, y, <span class="dv">2</span>,<span class="st">'linear'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">2</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    mse_ls.append(mse_ls_i)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    r2_ls.append(r2_ls_i)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    formulacion.append(<span class="st">'SVM'</span>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    account.append(acc)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    kernel.append(<span class="st">'linear'</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    _, _, mse_ls_i, r2_ls_i <span class="op">=</span> compare_svr(X, y, <span class="dv">2</span>,<span class="st">'rbf'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">2</span>)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    mse_ls.append(mse_ls_i)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    r2_ls.append(r2_ls_i)</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    formulacion.append(<span class="st">'SVM'</span>)</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    account.append(acc)</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    kernel.append(<span class="st">'rbf'</span>)</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    _, _, mse_ls_i, r2_ls_i <span class="op">=</span> compare_svr(X, y, <span class="dv">2</span>, <span class="st">'poly'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">2</span>)</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    mse_ls.append(mse_ls_i)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    r2_ls.append(r2_ls_i)</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    formulacion.append(<span class="st">'SVM'</span>)</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    account.append(acc)</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>    kernel.append(<span class="st">'poly'</span>)</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    _, _, mse_ls_i, r2_ls_i <span class="op">=</span> compare_lssvm(X, y, <span class="dv">2</span>,<span class="st">'linear'</span>, <span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    mse_ls.append(mse_ls_i)</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    r2_ls.append(r2_ls_i)</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    formulacion.append(<span class="st">'LS-SVM'</span>)</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    account.append(acc)</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>    kernel.append(<span class="st">'linear'</span>)</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>    _, _, mse_ls_i, r2_ls_i <span class="op">=</span> compare_lssvm(X, y, <span class="dv">2</span>,<span class="st">'rbf'</span>, <span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>    mse_ls.append(mse_ls_i)</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>    r2_ls.append(r2_ls_i)</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>    formulacion.append(<span class="st">'LS-SVM'</span>)</span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>    account.append(acc)</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>    kernel.append(<span class="st">'rbf'</span>)</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>    _, _, mse_ls_i, r2_ls_i <span class="op">=</span> compare_lssvm(X, y, <span class="dv">2</span>, <span class="st">'poly'</span>, <span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>    mse_ls.append(mse_ls_i)</span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>    r2_ls.append(r2_ls_i)</span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>    formulacion.append(<span class="st">'LS-SVM'</span>)</span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>    account.append(acc)</span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>    kernel.append(<span class="st">'poly'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="143">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> np.column_stack((account, formulacion, kernel, mse_ls, r2_ls))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> pd.DataFrame(results, columns<span class="op">=</span>[<span class="st">'Cuenta'</span>, <span class="st">'Formulación'</span>, <span class="st">'Kernel'</span>, <span class="st">'MSE'</span>, <span class="st">'R2'</span>])</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>results[<span class="st">'R2'</span>] <span class="op">=</span> <span class="bu">round</span>(results[<span class="st">'R2'</span>].astype(<span class="st">'float'</span>),<span class="dv">4</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>results_r2 <span class="op">=</span> results.pivot(index<span class="op">=</span>[<span class="st">'Cuenta'</span>, <span class="st">'Formulación'</span>], columns<span class="op">=</span>[<span class="st">'Kernel'</span>], values<span class="op">=</span>[<span class="st">'MSE'</span>])</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>results_r2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="143">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th colspan="3" halign="left">MSE</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Kernel</th>
+      <th>linear</th>
+      <th>poly</th>
+      <th>rbf</th>
+    </tr>
+    <tr>
+      <th>Cuenta</th>
+      <th>Formulación</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">CS HQ Owned and Allocated</th>
+      <th>LS-SVM</th>
+      <td>0.11376480825655297</td>
+      <td>0.2516990883267504</td>
+      <td>0.1641771390765005</td>
+    </tr>
+    <tr>
+      <th>SVM</th>
+      <td>0.0962190118913946</td>
+      <td>0.01975087419752183</td>
+      <td>0.18294040856804955</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Contact Center Expense</th>
+      <th>LS-SVM</th>
+      <td>0.028587267084786934</td>
+      <td>0.13182547329261665</td>
+      <td>0.04266072924115388</td>
+    </tr>
+    <tr>
+      <th>SVM</th>
+      <td>0.019354197200327692</td>
+      <td>0.08705331409652432</td>
+      <td>0.02320256003884509</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Delivery</th>
+      <th>LS-SVM</th>
+      <td>0.03188506605710325</td>
+      <td>0.1267037880765275</td>
+      <td>0.05703339116954864</td>
+    </tr>
+    <tr>
+      <th>SVM</th>
+      <td>0.03073320649164307</td>
+      <td>0.06662432949018945</td>
+      <td>0.024960094939029145</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Delivery OH</th>
+      <th>LS-SVM</th>
+      <td>0.012354066760490893</td>
+      <td>0.05303013470910281</td>
+      <td>0.0034235721235078226</td>
+    </tr>
+    <tr>
+      <th>SVM</th>
+      <td>0.01151884198825672</td>
+      <td>0.030993411847540696</td>
+      <td>0.0020003414649077647</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">GBU Owned and Allocated</th>
+      <th>LS-SVM</th>
+      <td>0.0012405687558735058</td>
+      <td>7.034584118734815e-05</td>
+      <td>0.001723118493310721</td>
+    </tr>
+    <tr>
+      <th>SVM</th>
+      <td>0.0091627593345123</td>
+      <td>0.010942657010076316</td>
+      <td>0.0016338332904508967</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Net Revenues</th>
+      <th>LS-SVM</th>
+      <td>0.008300862410787204</td>
+      <td>0.06666806049715726</td>
+      <td>0.02383605109601027</td>
+    </tr>
+    <tr>
+      <th>SVM</th>
+      <td>0.012821660964205941</td>
+      <td>0.0007145164542902668</td>
+      <td>0.022908868939022775</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Supply Chain</th>
+      <th>LS-SVM</th>
+      <td>0.11025592173576608</td>
+      <td>0.23765077790232533</td>
+      <td>0.05764225572281874</td>
+    </tr>
+    <tr>
+      <th>SVM</th>
+      <td>0.08915159521006297</td>
+      <td>0.12910153676566832</td>
+      <td>0.036654389472969555</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Supply Chain OH</th>
+      <th>LS-SVM</th>
+      <td>0.032867010237153715</td>
+      <td>0.007991364820857235</td>
+      <td>0.1438199592490491</td>
+    </tr>
+    <tr>
+      <th>SVM</th>
+      <td>0.04183373585284858</td>
+      <td>0.007833435788933826</td>
+      <td>0.21341098877495007</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Para ver gráficamente los resultados se graficara las 8 variables con la formulación y kernel con el mejor resultado:</p>
+<div class="cell" data-execution_count="144">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> build_data_sets(<span class="st">'CS HQ Owned and Allocated'</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>_, _, _, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">2</span>,<span class="st">'poly'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">2</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> build_data_sets(<span class="st">'Contact Center Expense'</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>_, _, _, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">2</span>,<span class="st">'linear'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">2</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> build_data_sets(<span class="st">'Delivery'</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>_, _, _, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">2</span>,<span class="st">'rbf'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">2</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> build_data_sets(<span class="st">'Delivery OH'</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>_, _, _, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">2</span>,<span class="st">'rbf'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">2</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> build_data_sets(<span class="st">'GBU Owned and Allocated'</span>)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>_, _, _, _ <span class="op">=</span> compare_lssvm(X, y, <span class="dv">2</span>, <span class="st">'poly'</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> build_data_sets(<span class="st">'Net Revenues'</span>)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>_, _, _, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">2</span>,<span class="st">'poly'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">2</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> build_data_sets(<span class="st">'Supply Chain'</span>)</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>_, _, _, _ <span class="op">=</span> compare_svr(X, y, <span class="dv">2</span>,<span class="st">'rbf'</span>, <span class="fl">0.1</span>, <span class="st">'auto'</span>, <span class="dv">2</span>, <span class="st">'Yes'</span>)</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> build_data_sets(<span class="st">'Supply Chain OH'</span>)</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>_, _, _, _ <span class="op">=</span> compare_lssvm(X, y, <span class="dv">2</span>, <span class="st">'poly'</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="st">'Yes'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-18-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-18-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-18-output-3.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-18-output-4.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-18-output-5.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-18-output-6.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-18-output-7.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="analisis_svr_files/figure-html/cell-18-output-8.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="discusión-de-resultados" class="level2">
+<h2 class="anchored" data-anchor-id="discusión-de-resultados">Discusión de resultados</h2>
+<p>Indiscutiblemente el kernel polinomial es el modelo que regresa los mejores resultados sin importar la formulación. La formulación LS-SVM con kernel polinomial regresa un ajuste perfecto. El kernel lineal y el radial funciona bien dependiendo de la cuenta, a veces tiene mejores resultados el lineal y a veces el radial. La formulación SVM regresa mejores resultados que LS - SVM para estos dos kernels.</p>
+<p>El problema observado con todos es al momento de extrapolar y dados los resultados con los datos de prueba, hay modelos que entregaron un <span class="math inline">\(R^2\)</span> negativo.</p>
+<p>Para tener resultados en los valores originales solo es necesario utilizar la función <em>inverse_transform()</em> de la clase <em>MinMaxScaler</em>. Los resultados seran los mismos solo que a una escala mayor.</p>
+<div class="cell" data-execution_count="161">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#data split</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>acc <span class="op">=</span> <span class="st">'GBU Owned and Allocated'</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>test_window <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> data[acc].values[<span class="dv">1</span>:]</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> y.ravel()</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>X_others <span class="op">=</span> data[<span class="bu">list</span>(<span class="bu">set</span>(data.columns) <span class="op">-</span> <span class="bu">set</span>(acc))].values[:<span class="op">-</span><span class="dv">1</span>,:]</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>X_q <span class="op">=</span> [<span class="dv">1</span> <span class="cf">if</span> x<span class="op">%</span><span class="dv">3</span> <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">0</span> <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(X_periods))]</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>X_q <span class="op">=</span> np.array(X_q[<span class="dv">1</span>:])</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.column_stack((X_periods[<span class="dv">1</span>:], X_others, X_q))</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> X[:<span class="op">-</span>test_window]</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> X[<span class="bu">len</span>(X) <span class="op">-</span> test_window:]</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> y[:<span class="op">-</span>test_window]</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>y_test <span class="op">=</span> y[<span class="bu">len</span>(y) <span class="op">-</span> test_window:]</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>scaler_X <span class="op">=</span> MinMaxScaler()</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>scaler_X.fit(X_train)</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> scaler_X.transform(X_train)</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> scaler_X.transform(X_test)</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="co"># creating a SVR model class</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>model_svr <span class="op">=</span> SVR(kernel<span class="op">=</span><span class="st">'poly'</span>, gamma<span class="op">=</span><span class="dv">1</span>, degree<span class="op">=</span><span class="dv">3</span>, epsilon<span class="op">=</span><span class="dv">2</span>, C<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Training the model</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>model_svr.fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="161">
+<pre><code>SVR(C=0.5, epsilon=2, gamma=1, kernel='poly')</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="162">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'model.pkl'</span>, <span class="st">'wb'</span>) <span class="im">as</span> model_file:</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  pickle.dump(model_svr, model_file)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="referencias" class="level2">
+<h2 class="anchored" data-anchor-id="referencias">Referencias</h2>
+<ul>
+<li><p>sklearn. (n.d.). sklearn.svm.SVR. Scikit-Learn. Retrieved May 6, 2022, from https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html</p></li>
+<li><p>Danny, V. (2020, August 19). Building your own scikit-learn Regressor-Class: LS-SVM as an example. The Delocalized Physicist. Retrieved April 30, 2022, from https://dannyvanpoucke.be/building-scikit-learn-regressor-lssvm-en/</p></li>
+</ul>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

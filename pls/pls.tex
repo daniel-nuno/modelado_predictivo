@@ -1,0 +1,596 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% Make \paragraph and \subparagraph free-standing
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\makeatletter
+\@ifpackageloaded{tcolorbox}{}{\usepackage[many]{tcolorbox}}
+\makeatother
+\makeatletter
+\@ifundefined{shadecolor}{\definecolor{shadecolor}{rgb}{.97, .97, .97}}
+\makeatother
+\makeatletter
+\makeatother
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, enhanced, interior hidden, breakable, boxrule=0pt, sharp corners, frame hidden]}{\end{tcolorbox}}\fi
+
+\begin{figure}
+
+{\centering \includegraphics{https://upload.wikimedia.org/wikipedia/en/5/5f/Western_Institute_of_Technology_and_Higher_Education_logo.png}
+
+}
+
+\caption{iteso}
+
+\end{figure}
+
+\hypertarget{institutotecnoluxf3gico-y-de-estudios-superiores-de-occidente}{%
+\subsubsection{InstitutoTecnológico y de Estudios Superiores de
+Occidente}\label{institutotecnoluxf3gico-y-de-estudios-superiores-de-occidente}}
+
+\hypertarget{maestruxeda-ciencia-de-datos}{%
+\subsubsection{Maestría Ciencia de
+Datos}\label{maestruxeda-ciencia-de-datos}}
+
+\hypertarget{modelado-predictivo}{%
+\subsubsection{Modelado Predictivo}\label{modelado-predictivo}}
+
+\hypertarget{tarea-1-pls-for-regression}{%
+\section{Tarea 1: PLS for regression}\label{tarea-1-pls-for-regression}}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Estudiante: Daniel Nuño Profesor: Dr.~Riemann Ruiz Cruz Fecha entrega: 7
+de septiembre 2022
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{introduction}{%
+\subsection{Introduction}\label{introduction}}
+
+The dataset that will be used for this activity has the name
+\textbf{Airfoil Self-Noise Data Set} and it can be found in the
+repository
+\href{https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise}{UC
+Irvine Machine Learning Repository}. The data collected is related to
+different size NACA 0012 airfoils at various wind tunnel speeds and
+angles of attack. The span of the airfoil and the observer position were
+the same in all of the experiment.
+
+Using the data set mentioned, develop the following points.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Determine if there is missing data and decide if it is appropriate to
+  use some strategy to fill in the missing data.
+\item
+  Create two subsets of data, where the first one will be used for the
+  training process and the second one for the testing process.
+\item
+  Train a linear model to estimate the feature ``Sound Pressure Level''
+  using as inputs to the model all other variables. Get the values of
+  RMSE and to evaluate the performance of the model in both training and
+  testing.
+\item
+  Considering the data set used in point 3; perform elimination of some
+  variables using variance criterion or correlation criterion. With the
+  variables resulting from the elimination process, I trained a new
+  linear model and calculate the metrics RMSE and corresponding to
+  training and testing.
+\item
+  Considering the data set used in point 3 again; perform variable
+  reduction by principal component analysis. With the variables
+  resulting from the reduction process, train a new linear model and
+  calculate the metrics RMSE and corresponding to training and testing.
+\item
+  Considering the data set used in point 3 again; train a new linear
+  model using PLS technique and calculated the metrics RMSE and
+  corresponding to training and testing.
+\item
+  As a result of the previous steps, we have four different linear
+  models to solve the problem proposed. Make a table with the metrics of
+  each model to make a comparison of the models.
+\end{enumerate}
+
+\hypertarget{development}{%
+\subsection{Development}\label{development}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+\ImportTok{import}\NormalTok{ numpy }\ImportTok{as}\NormalTok{ np}
+\NormalTok{data }\OperatorTok{=}\NormalTok{ pd.read\_csv(}\StringTok{\textquotesingle{}airfoil\_self\_noise.dat\textquotesingle{}}\NormalTok{, header}\OperatorTok{=}\VariableTok{None}\NormalTok{, sep}\OperatorTok{=}\StringTok{"\textbackslash{}s+"}\NormalTok{)}
+\CommentTok{\# 1. Frequency, in Hertzs.}
+\CommentTok{\# 2. Angle of attack, in degrees.}
+\CommentTok{\# 3. Chord length, in meters.}
+\CommentTok{\# 4. Free{-}stream velocity, in meters per second.}
+\CommentTok{\# 5. Suction side displacement thickness, in meters.}
+\CommentTok{\# 6. Scaled sound pressure level, in decibels. This is the Response variable}
+\NormalTok{names }\OperatorTok{=}\NormalTok{ [}\StringTok{"freq"}\NormalTok{, }\StringTok{"angle"}\NormalTok{, }\StringTok{"clength"}\NormalTok{, }\StringTok{"speed"}\NormalTok{, }\StringTok{"thickness"}\NormalTok{, }\StringTok{"soundp"}\NormalTok{]}
+\NormalTok{data.columns }\OperatorTok{=}\NormalTok{ names}
+\NormalTok{data.head()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule()
+& freq & angle & clength & speed & thickness & soundp \\
+\midrule()
+\endhead
+0 & 800 & 0.0 & 0.3048 & 71.3 & 0.002663 & 126.201 \\
+1 & 1000 & 0.0 & 0.3048 & 71.3 & 0.002663 & 125.201 \\
+2 & 1250 & 0.0 & 0.3048 & 71.3 & 0.002663 & 125.951 \\
+3 & 1600 & 0.0 & 0.3048 & 71.3 & 0.002663 & 127.591 \\
+4 & 2000 & 0.0 & 0.3048 & 71.3 & 0.002663 & 127.461 \\
+\bottomrule()
+\end{longtable}
+
+\hypertarget{determine-if-there-is-missing-data-and-decide-if-it-is-appropriate-to-use-some-strategy-to-fill-in-the-missing-data.}{%
+\subsubsection{Determine if there is missing data and decide if it is
+appropriate to use some strategy to fill in the missing
+data.}\label{determine-if-there-is-missing-data-and-decide-if-it-is-appropriate-to-use-some-strategy-to-fill-in-the-missing-data.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data.describe()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule()
+& freq & angle & clength & speed & thickness & soundp \\
+\midrule()
+\endhead
+count & 1503.000000 & 1503.000000 & 1503.000000 & 1503.000000 &
+1503.000000 & 1503.000000 \\
+mean & 2886.380572 & 6.782302 & 0.136548 & 50.860745 & 0.011140 &
+124.835943 \\
+std & 3152.573137 & 5.918128 & 0.093541 & 15.572784 & 0.013150 &
+6.898657 \\
+min & 200.000000 & 0.000000 & 0.025400 & 31.700000 & 0.000401 &
+103.380000 \\
+25\% & 800.000000 & 2.000000 & 0.050800 & 39.600000 & 0.002535 &
+120.191000 \\
+50\% & 1600.000000 & 5.400000 & 0.101600 & 39.600000 & 0.004957 &
+125.721000 \\
+75\% & 4000.000000 & 9.900000 & 0.228600 & 71.300000 & 0.015576 &
+129.995500 \\
+max & 20000.000000 & 22.200000 & 0.304800 & 71.300000 & 0.058411 &
+140.987000 \\
+\bottomrule()
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data.isnull().}\BuiltInTok{sum}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+freq         0
+angle        0
+clength      0
+speed        0
+thickness    0
+soundp       0
+dtype: int64
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data.isna().}\BuiltInTok{sum}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+freq         0
+angle        0
+clength      0
+speed        0
+thickness    0
+soundp       0
+dtype: int64
+\end{verbatim}
+
+There are no missing values detected at this point.
+
+\hypertarget{create-two-subsets-of-data-where-the-first-one-will-be-used-for-the-training-process-and-the-second-one-for-the-testing-process.}{%
+\subsubsection{Create two subsets of data, where the first one will be
+used for the training process and the second one for the testing
+process.}\label{create-two-subsets-of-data-where-the-first-one-will-be-used-for-the-training-process-and-the-second-one-for-the-testing-process.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ sklearn.model\_selection }\ImportTok{import}\NormalTok{ train\_test\_split}
+
+\NormalTok{X\_train, X\_test, y\_train, y\_test }\OperatorTok{=}\NormalTok{ train\_test\_split(data.drop(}\StringTok{"soundp"}\NormalTok{, axis}\OperatorTok{=}\DecValTok{1}\NormalTok{),}
+\NormalTok{                                                    data[}\StringTok{"soundp"}\NormalTok{],}
+\NormalTok{                                                    test\_size}\OperatorTok{=}\FloatTok{0.3}\NormalTok{, random\_state}\OperatorTok{=}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{train-a-linear-model-to-estimate-the-feature-sound-pressure-level-using-as-inputs-to-the-model-all-other-variables.-get-the-values-of-rmse-and-to-evaluate-the-performance-of-the-model-in-both-training-and-testing.}{%
+\subsubsection{Train a linear model to estimate the feature ``Sound
+Pressure Level'' using as inputs to the model all other variables. Get
+the values of RMSE and to evaluate the performance of the model in both
+training and
+testing.}\label{train-a-linear-model-to-estimate-the-feature-sound-pressure-level-using-as-inputs-to-the-model-all-other-variables.-get-the-values-of-rmse-and-to-evaluate-the-performance-of-the-model-in-both-training-and-testing.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ matplotlib.pyplot }\ImportTok{as}\NormalTok{ plt}
+\ImportTok{from}\NormalTok{ sklearn.linear\_model }\ImportTok{import}\NormalTok{ LinearRegression}
+\ImportTok{from}\NormalTok{ sklearn.metrics }\ImportTok{import}\NormalTok{ (mean\_squared\_error,r2\_score)}
+
+\NormalTok{linreg }\OperatorTok{=}\NormalTok{ LinearRegression()}
+\NormalTok{linreg.fit(X\_train, y\_train)}
+
+\NormalTok{y\_predict\_train }\OperatorTok{=}\NormalTok{ linreg.predict(X\_train)}
+\NormalTok{y\_predict\_test }\OperatorTok{=}\NormalTok{ linreg.predict(X\_test)}
+
+\NormalTok{original\_mse\_train }\OperatorTok{=}\NormalTok{ mean\_squared\_error(y\_train,y\_predict\_train, squared}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+\NormalTok{original\_mse\_test }\OperatorTok{=}\NormalTok{ mean\_squared\_error(y\_test,y\_predict\_test, squared}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+
+\NormalTok{(original\_mse\_train, original\_mse\_test)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(4.725472625187291, 4.97823738797826)
+\end{verbatim}
+
+\hypertarget{considering-the-data-set-used-in-point-3-perform-elimination-of-some-variables-using-variance-criterion-or-correlation-criterion.-with-the-variables-resulting-from-the-elimination-process-i-trained-a-new-linear-model-and-calculate-the-metrics-rmse-and-corresponding-to-training-and-testing.}{%
+\subsubsection{Considering the data set used in point 3; perform
+elimination of some variables using variance criterion or correlation
+criterion. With the variables resulting from the elimination process, I
+trained a new linear model and calculate the metrics RMSE and
+corresponding to training and
+testing.}\label{considering-the-data-set-used-in-point-3-perform-elimination-of-some-variables-using-variance-criterion-or-correlation-criterion.-with-the-variables-resulting-from-the-elimination-process-i-trained-a-new-linear-model-and-calculate-the-metrics-rmse-and-corresponding-to-training-and-testing.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ sklearn.feature\_selection }\ImportTok{import}\NormalTok{ VarianceThreshold}
+
+\NormalTok{sel }\OperatorTok{=}\NormalTok{ VarianceThreshold(threshold }\OperatorTok{=} \FloatTok{0.5}\NormalTok{)}
+\NormalTok{sel.fit\_transform(X\_train)}
+\NormalTok{sel.get\_feature\_names\_out()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+array(['freq', 'angle', 'speed'], dtype=object)
+\end{verbatim}
+
+Accordign to VarianceThreshold, we can keep columns \textbf{freq},
+\textbf{angle} and \textbf{speed}. The feature selector that removes all
+low-variance features. This feature selection algorithm looks only at
+the features (X), not the desired outputs (y), and can thus be used for
+unsupervised learning.
+
+threshold parameter specifies that features with a training-set variance
+lower than this threshold will be removed. The default is to keep all
+features with non-zero variance, i.e.~remove the features that have the
+same value in all samples.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{X\_train, X\_test, y\_train, y\_test }\OperatorTok{=}\NormalTok{ train\_test\_split(data[[}\StringTok{\textquotesingle{}freq\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}angle\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}speed\textquotesingle{}}\NormalTok{]],}
+\NormalTok{                                                    data[}\StringTok{"soundp"}\NormalTok{],}
+\NormalTok{                                                    test\_size}\OperatorTok{=}\FloatTok{0.3}\NormalTok{, random\_state}\OperatorTok{=}\DecValTok{1}\NormalTok{)}
+
+\NormalTok{linreg }\OperatorTok{=}\NormalTok{ LinearRegression()}
+\NormalTok{linreg.fit(X\_train, y\_train)}
+
+\NormalTok{y\_predict\_train }\OperatorTok{=}\NormalTok{ linreg.predict(X\_train)}
+\NormalTok{y\_predict\_test }\OperatorTok{=}\NormalTok{ linreg.predict(X\_test)}
+
+\NormalTok{step\_mse\_train }\OperatorTok{=}\NormalTok{ mean\_squared\_error(y\_train,y\_predict\_train, squared}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+\NormalTok{step\_mse\_test }\OperatorTok{=}\NormalTok{ mean\_squared\_error(y\_test,y\_predict\_test, squared}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+
+\NormalTok{(step\_mse\_train, step\_mse\_test)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(5.892135487526167, 5.899347143678915)
+\end{verbatim}
+
+\hypertarget{considering-the-data-set-used-in-point-3-again-perform-variable-reduction-by-principal-component-analysis.-with-the-variables-resulting-from-the-reduction-process-train-a-new-linear-model-and-calculate-the-metrics-rmse-and-corresponding-to-training-and-testing.}{%
+\subsubsection{Considering the data set used in point 3 again; perform
+variable reduction by principal component analysis. With the variables
+resulting from the reduction process, train a new linear model and
+calculate the metrics RMSE and corresponding to training and
+testing.}\label{considering-the-data-set-used-in-point-3-again-perform-variable-reduction-by-principal-component-analysis.-with-the-variables-resulting-from-the-reduction-process-train-a-new-linear-model-and-calculate-the-metrics-rmse-and-corresponding-to-training-and-testing.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ sklearn.decomposition }\ImportTok{import}\NormalTok{ PCA}
+
+\NormalTok{X\_train, X\_test, y\_train, y\_test }\OperatorTok{=}\NormalTok{ train\_test\_split(data.drop(}\StringTok{"soundp"}\NormalTok{, axis}\OperatorTok{=}\DecValTok{1}\NormalTok{),}
+\NormalTok{                                                    data[}\StringTok{"soundp"}\NormalTok{],}
+\NormalTok{                                                    test\_size}\OperatorTok{=}\FloatTok{0.3}\NormalTok{, random\_state}\OperatorTok{=}\DecValTok{1}\NormalTok{)}
+
+\NormalTok{pca }\OperatorTok{=}\NormalTok{ PCA()}
+\NormalTok{pca.fit(X\_train)}
+\NormalTok{data\_pca }\OperatorTok{=}\NormalTok{ pca.transform(X\_train)}
+\NormalTok{data\_pca }\OperatorTok{=}\NormalTok{ pd.DataFrame(data\_pca, columns}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}x1*\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}x2*\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}x3*\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}x4*\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}x5*\textquotesingle{}}\NormalTok{])}
+\NormalTok{data\_pca[}\StringTok{"soundp"}\NormalTok{] }\OperatorTok{=}\NormalTok{ data[}\StringTok{"soundp"}\NormalTok{]}
+
+\NormalTok{pca.explained\_variance\_ratio\_}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+array([9.99973821e-01, 2.30916970e-05, 3.08642017e-06, 6.29162995e-10,
+       6.68357489e-12])
+\end{verbatim}
+
+According to PCA the first principal componenc is suffient because it
+explains 99.9\% of the explained variance.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{linreg.fit(data\_pca[[}\StringTok{\textquotesingle{}x1*\textquotesingle{}}\NormalTok{]], y\_train)}
+\NormalTok{y\_predict\_train }\OperatorTok{=}\NormalTok{ linreg.predict(data\_pca[[}\StringTok{\textquotesingle{}x1*\textquotesingle{}}\NormalTok{]])}
+\CommentTok{\#pca\textquotesingle{}d test set}
+\NormalTok{data\_pca\_test }\OperatorTok{=}\NormalTok{ pca.transform(X\_test)}
+\NormalTok{data\_pca\_test }\OperatorTok{=}\NormalTok{ pd.DataFrame(data\_pca\_test, columns}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}x1*\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}x2*\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}x3*\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}x4*\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}x5*\textquotesingle{}}\NormalTok{])}
+\NormalTok{linreg.fit(data\_pca\_test[[}\StringTok{\textquotesingle{}x1*\textquotesingle{}}\NormalTok{]], y\_test)}
+\NormalTok{y\_predict\_test }\OperatorTok{=}\NormalTok{ linreg.predict(data\_pca\_test[[}\StringTok{\textquotesingle{}x1*\textquotesingle{}}\NormalTok{]])}
+
+\NormalTok{pca\_mse\_train }\OperatorTok{=}\NormalTok{ mean\_squared\_error(y\_train,y\_predict\_train, squared}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+\NormalTok{pca\_mse\_test }\OperatorTok{=}\NormalTok{ mean\_squared\_error(y\_test,y\_predict\_test, squared}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+
+\NormalTok{(pca\_mse\_train, pca\_mse\_test)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(6.369948882209672, 6.2702984020999315)
+\end{verbatim}
+
+\hypertarget{considering-the-data-set-used-in-point-3-again-train-a-new-linear-model-using-pls-technique-and-calculated-the-metrics-rmse-and-corresponding-to-training-and-testing.}{%
+\subsubsection{Considering the data set used in point 3 again; train a
+new linear model using PLS technique and calculated the metrics RMSE and
+corresponding to training and
+testing.}\label{considering-the-data-set-used-in-point-3-again-train-a-new-linear-model-using-pls-technique-and-calculated-the-metrics-rmse-and-corresponding-to-training-and-testing.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ sklearn.cross\_decomposition }\ImportTok{import}\NormalTok{ PLSRegression}
+
+\NormalTok{X\_train, X\_test, y\_train, y\_test }\OperatorTok{=}\NormalTok{ train\_test\_split(data.drop(}\StringTok{"soundp"}\NormalTok{, axis}\OperatorTok{=}\DecValTok{1}\NormalTok{),}
+\NormalTok{                                                    data[}\StringTok{"soundp"}\NormalTok{],}
+\NormalTok{                                                    test\_size}\OperatorTok{=}\FloatTok{0.3}\NormalTok{, random\_state}\OperatorTok{=}\DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# Aplicamos PLS}
+\NormalTok{pls }\OperatorTok{=}\NormalTok{ PLSRegression(n\_components}\OperatorTok{=}\DecValTok{1}\NormalTok{)}
+\NormalTok{pls.fit(data.drop(}\StringTok{"soundp"}\NormalTok{, axis}\OperatorTok{=}\DecValTok{1}\NormalTok{), data[}\StringTok{"soundp"}\NormalTok{])}
+
+\NormalTok{y\_predict\_train }\OperatorTok{=}\NormalTok{ pls.predict(X\_train)}
+\NormalTok{y\_predict\_test }\OperatorTok{=}\NormalTok{ pls.predict(X\_test)}
+
+\NormalTok{pls\_mse\_train }\OperatorTok{=}\NormalTok{ mean\_squared\_error(y\_train,y\_predict\_train, squared}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+\NormalTok{pls\_mse\_test }\OperatorTok{=}\NormalTok{ mean\_squared\_error(y\_test,y\_predict\_test, squared}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+\NormalTok{(pls\_mse\_train, pls\_mse\_test)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(4.849093920288027, 5.093148922223512)
+\end{verbatim}
+
+\hypertarget{as-a-result-of-the-previous-steps-we-have-four-different-linear-models-to-solve-the-problem-proposed.-make-a-table-with-the-metrics-of-each-model-to-make-a-comparison-of-the-models.}{%
+\subsubsection{As a result of the previous steps, we have four different
+linear models to solve the problem proposed. Make a table with the
+metrics of each model to make a comparison of the
+models.}\label{as-a-result-of-the-previous-steps-we-have-four-different-linear-models-to-solve-the-problem-proposed.-make-a-table-with-the-metrics-of-each-model-to-make-a-comparison-of-the-models.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{results }\OperatorTok{=}\NormalTok{ \{}\StringTok{\textquotesingle{}Modelo\textquotesingle{}}\NormalTok{: [}\StringTok{"Original"}\NormalTok{, }\StringTok{"Varianza"}\NormalTok{, }\StringTok{"PCA"}\NormalTok{, }\StringTok{"PLS"}\NormalTok{],}
+           \StringTok{\textquotesingle{}RMSE Train\textquotesingle{}}\NormalTok{: [original\_mse\_train, step\_mse\_train, pca\_mse\_train, pls\_mse\_train],}
+           \StringTok{\textquotesingle{}RMSE Test\textquotesingle{}}\NormalTok{: [original\_mse\_test, step\_mse\_test, pca\_mse\_test, pls\_mse\_test]\}}
+
+\NormalTok{results }\OperatorTok{=}\NormalTok{ pd.DataFrame(data}\OperatorTok{=}\NormalTok{results)}
+\NormalTok{results}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule()
+& Modelo & RMSE Train & RMSE Test \\
+\midrule()
+\endhead
+0 & Original & 4.725473 & 4.978237 \\
+1 & Varianza & 5.892135 & 5.899347 \\
+2 & PCA & 6.369949 & 6.270298 \\
+3 & PLS & 4.849094 & 5.093149 \\
+\bottomrule()
+\end{longtable}
+
+\hypertarget{conclusion}{%
+\subsection{Conclusion}\label{conclusion}}
+
+PLS method turns out to be very similar, in termns of error, to the
+original linear regresión with all data. However with the advantage, or
+disaventage, to have one liner combined component.
+
+
+
+\end{document}
